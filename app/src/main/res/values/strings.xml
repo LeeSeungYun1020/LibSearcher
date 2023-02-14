@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">ToySearcher</string>
+    <string name="id">ID (can empty)</string>
+    <string name="pw" translatable="false">PW (API Key)</string>
+    <string name="type">Type</string>
+    <string name="start">Start</string>
+    <string name="error_input">Please check your input again.</string>
 </resources>
