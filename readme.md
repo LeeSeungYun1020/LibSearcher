@@ -36,3 +36,4 @@
 - 결과 표시 기능 흐름도
 
 ![Result flowchart](img/flow_result.png)
+
