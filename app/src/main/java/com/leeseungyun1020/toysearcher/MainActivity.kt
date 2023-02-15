@@ -29,6 +29,16 @@ class MainActivity : AppCompatActivity() {
                     id: Long
                 ) {
                     type = Type.values()[position]
+                    when(type) {
+                        Type.NAVER -> {
+                            binding.idEditText.setText(BuildConfig.NAVER_CLIENT_ID)
+                            binding.pwEditText.setText(BuildConfig.NAVER_CLIENT_PW)
+                        }
+                        Type.DAUM -> {
+                            binding.idEditText.setText("")
+                            binding.pwEditText.setText(BuildConfig.KAKAO_REST_API_KEY)
+                        }
+                    }
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {
