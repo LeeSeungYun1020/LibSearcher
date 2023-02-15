@@ -1,19 +1,48 @@
 package com.leeseungyun1020.searcher
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.commit
+import androidx.fragment.app.replace
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.leeseungyun1020.searcher.databinding.ActivityHomeBinding
-import com.leeseungyun1020.searcher.utilities.ExtraNames
-import com.leeseungyun1020.searcher.utilities.Type
+import com.leeseungyun1020.searcher.ui.LoginFragment
+import com.leeseungyun1020.searcher.ui.SearchFragment
+import com.leeseungyun1020.searcher.utilities.HomeFragments
+import com.leeseungyun1020.searcher.viewmodels.HomeViewModel
+import kotlinx.coroutines.launch
 
 class HomeActivity : AppCompatActivity() {
     private lateinit var binding: ActivityHomeBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val viewModel: HomeViewModel by viewModels()
         binding = ActivityHomeBinding.inflate(layoutInflater)
-        binding.type = Type.valueOf(intent.getStringExtra(ExtraNames.Home.type) ?: Type.values().first().name)
-        binding.id = intent.getStringExtra(ExtraNames.Home.id) ?: ""
-        binding.pw = intent.getStringExtra(ExtraNames.Home.pw) ?: ""
+        binding.viewModel = viewModel
         setContentView(binding.root)
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.location.collect {
+                    navigateTo(it)
+                }
+            }
+        }
+    }
+
+    private fun navigateTo(destination: HomeFragments) {
+        supportFragmentManager.commit {
+            when (destination) {
+                HomeFragments.LOGIN -> {
+                    replace<LoginFragment>(R.id.fragment_container_view)
+                }
+                HomeFragments.SEARCH -> {
+                    replace<SearchFragment>(R.id.fragment_container_view)
+                }
+            }
+        }
     }
 }
