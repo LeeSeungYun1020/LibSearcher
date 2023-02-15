@@ -9,40 +9,37 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".ui.SearchFragment">
+        android:layout_height="match_parent">
 
-        <EditText
-            android:id="@+id/search_box"
+        <Button
+            android:id="@+id/news_tab_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:hint="@string/msg_enter_keyword"
-            android:importantForAutofill="no"
-            android:inputType="text"
-            android:maxLines="1"
-            app:layout_constraintEnd_toStartOf="@id/search_button"
+            android:drawableStart="@drawable/ic_newspaper_24"
+            android:text="@string/news"
+            app:layout_constraintEnd_toStartOf="@id/image_tab_button"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageButton
-            android:id="@+id/search_button"
-            android:layout_width="wrap_content"
+        <Button
+            android:id="@+id/image_tab_button"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:contentDescription="@string/search"
-            android:src="@drawable/ic_search_24"
+            android:drawableStart="@drawable/ic_image_24"
+            android:text="@string/image"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/search_box"
+            app:layout_constraintStart_toEndOf="@id/news_tab_button"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <include
-            android:id="@+id/search_tab"
-            layout="@layout/search_tab"
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/result_container"
+            android:name="com.leeseungyun1020.searcher.ui.ResultFragment"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/search_box" />
-
+            app:layout_constraintTop_toBottomOf="@id/news_tab_button"
+            tools:layout="@layout/fragment_result" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
