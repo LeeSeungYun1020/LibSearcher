@@ -1,4 +1,4 @@
-package com.leeseungyun1020.searcher
+package com.leeseungyun1020.searcher.ui
 
 import android.os.Bundle
 import androidx.activity.viewModels
@@ -8,9 +8,8 @@ import androidx.fragment.app.replace
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.leeseungyun1020.searcher.R
 import com.leeseungyun1020.searcher.databinding.ActivityHomeBinding
-import com.leeseungyun1020.searcher.ui.LoginFragment
-import com.leeseungyun1020.searcher.ui.SearchFragment
 import com.leeseungyun1020.searcher.utilities.HomeFragments
 import com.leeseungyun1020.searcher.viewmodels.HomeViewModel
 import kotlinx.coroutines.launch

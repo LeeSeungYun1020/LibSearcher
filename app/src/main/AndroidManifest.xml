@@ -27,6 +27,9 @@
         </activity>
 
         <meta-data
+            android:name="com.leeseungyun1020.searcher.sdk.type"
+            android:value="naver" />
+        <meta-data
             android:name="com.leeseungyun1020.searcher.sdk.naver.id"
             android:value="" />
         <meta-data
