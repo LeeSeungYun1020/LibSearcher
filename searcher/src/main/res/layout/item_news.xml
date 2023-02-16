@@ -5,17 +5,21 @@
 
     <data>
 
+        <variable
+            name="news"
+            type="com.leeseungyun1020.searcher.data.News" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
         <TextView
             android:id="@+id/date"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/template_date"
+            android:text="@{news.date}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -25,6 +29,7 @@
             android:layout_width="64dp"
             android:layout_height="0dp"
             android:contentDescription="@string/image"
+            app:imageFromUrl="@{news.imageUrl}"
             app:layout_constraintDimensionRatio="H,1:1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/date"
@@ -35,6 +40,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
+            android:text="@{news.title}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/image"
             app:layout_constraintTop_toBottomOf="@id/date" />
@@ -45,6 +51,7 @@
             android:layout_marginStart="8dp"
             android:ellipsize="end"
             android:maxLines="2"
+            android:text="@{news.contents}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/image"
             app:layout_constraintTop_toBottomOf="@id/title" />
