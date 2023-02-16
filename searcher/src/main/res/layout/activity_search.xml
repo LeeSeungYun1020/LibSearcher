@@ -4,13 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
+        <variable
+            name="viewModel"
+            type="com.leeseungyun1020.searcher.viewmodels.SearchViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.SearchFragment">
+        tools:context=".ui.SearchActivity">
 
         <EditText
             android:id="@+id/search_box"
@@ -43,6 +45,5 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/search_box" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

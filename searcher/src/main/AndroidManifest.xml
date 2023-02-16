@@ -10,7 +10,7 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".ui.HomeActivity"
+            android:name=".ui.SearchActivity"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"

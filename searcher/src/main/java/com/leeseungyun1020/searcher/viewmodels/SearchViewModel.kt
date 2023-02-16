@@ -5,7 +5,7 @@ import com.leeseungyun1020.searcher.utilities.HomeFragments
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class HomeViewModel : ViewModel() {
+class SearchViewModel : ViewModel() {
     private val _location = MutableStateFlow(HomeFragments.LOGIN)
     val location = _location.asStateFlow()
 
