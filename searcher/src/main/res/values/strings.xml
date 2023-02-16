@@ -5,4 +5,6 @@
     <string name="search">Search</string>
     <string name="image">Image</string>
     <string name="news">News</string>
+    <string name="title">Title</string>
+    <string name="template_date" translatable="false">2022/02/02</string>
 </resources>
