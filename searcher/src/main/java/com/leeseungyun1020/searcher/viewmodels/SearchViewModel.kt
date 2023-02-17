@@ -1,15 +1,34 @@
 package com.leeseungyun1020.searcher.viewmodels
 
 import androidx.lifecycle.ViewModel
-import com.leeseungyun1020.searcher.utilities.HomeFragments
+import androidx.lifecycle.viewModelScope
+import com.leeseungyun1020.searcher.data.Image
+import com.leeseungyun1020.searcher.data.News
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 class SearchViewModel : ViewModel() {
-    private val _location = MutableStateFlow(HomeFragments.LOGIN)
-    val location = _location.asStateFlow()
+    private val _keyword = MutableStateFlow("")
+    val keyword = _keyword.asStateFlow()
 
-    fun navigateTo(destination: HomeFragments) {
-        _location.value = destination
+    private val _imageResult = MutableStateFlow(emptyList<Image>())
+    val imageResult = _imageResult.asStateFlow()
+
+
+    private val _newsResult = MutableStateFlow(emptyList<News>())
+    val newsResult = _newsResult.asStateFlow()
+
+    fun search(keyword: String) {
+        if (keyword.isNotBlank()) {
+            _keyword.value = keyword
+            loadResult()
+        }
+    }
+
+    fun loadResult() {
+        viewModelScope.launch {
+            TODO("Get data using NetworkManager")
+        }
     }
 }
