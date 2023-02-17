@@ -1,6 +1,5 @@
 package com.leeseungyun1020.searcher.network
 
-import com.google.gson.Gson
 import com.leeseungyun1020.searcher.utilities.Type
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -25,10 +24,21 @@ object NetworkManager {
         this.pw = pw
     }
 
-    suspend inline fun <reified T> getDataFromUrl(url: String): T = withContext(Dispatchers.IO) {
+    suspend fun getResponseFromUrl(url: String): String = withContext(Dispatchers.IO) {
         val connection = URL(url).openConnection() as HttpURLConnection
-        connection.requestMethod = "GET"
-        connection.connect()
+        connection.apply {
+            requestMethod = "GET"
+            when (type) {
+                Type.NAVER -> {
+                    connection.setRequestProperty("X-Naver-Client-Id", id)
+                    connection.setRequestProperty("X-Naver-Client-Secret", pw)
+                }
+                Type.KAKAO -> {
+                    TODO("KAKAO SETTING")
+                }
+            }
+            connect()
+        }
 
         val responseCode = connection.responseCode
         if (responseCode != HttpURLConnection.HTTP_OK) {
@@ -40,6 +50,6 @@ object NetworkManager {
         inputReader.close()
         connection.disconnect()
 
-        Gson().fromJson(response, T::class.java)
+        response
     }
 }
