@@ -10,7 +10,20 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 object NetworkManager {
-    var type = Type.NAVER
+    private var type = Type.NAVER
+    private var id = ""
+    private var pw = ""
+
+    fun init(type: Type, id: String, pw: String) {
+        this.type = type
+        this.id = id
+        this.pw = pw
+    }
+
+    fun init(type: Type, pw: String) {
+        this.type = type
+        this.pw = pw
+    }
 
     suspend inline fun <reified T> getDataFromUrl(url: String): T = withContext(Dispatchers.IO) {
         val connection = URL(url).openConnection() as HttpURLConnection
