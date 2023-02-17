@@ -5,24 +5,51 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.commit
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import com.leeseungyun1020.searcher.R
 import com.leeseungyun1020.searcher.databinding.ActivitySearchBinding
 import com.leeseungyun1020.searcher.network.NetworkManager
+import com.leeseungyun1020.searcher.utilities.ResultCategory
 import com.leeseungyun1020.searcher.utilities.TAG
 import com.leeseungyun1020.searcher.utilities.Type
 import com.leeseungyun1020.searcher.viewmodels.SearchViewModel
 import com.nostra13.universalimageloader.core.ImageLoader
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration
+import kotlinx.coroutines.launch
 
 class SearchActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySearchBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val viewModel: SearchViewModel by viewModels()
+
+        ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(this))
+        checkMetaData()
+
         binding = ActivitySearchBinding.inflate(layoutInflater)
         binding.viewModel = viewModel
+        binding.searchTab.newsTabButton.setOnClickListener {
+            viewModel.onCategoryButtonClicked(ResultCategory.NEWS)
+        }
+        binding.searchTab.imageTabButton.setOnClickListener {
+            viewModel.onCategoryButtonClicked(ResultCategory.IMAGE)
+        }
         setContentView(binding.root)
-        ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(this))
 
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.location.collect {
+                    supportFragmentManager.commit {
+                        replace(R.id.result_container, ResultFragment.newInstance(it))
+                        setReorderingAllowed(true)
+                        addToBackStack(it.name)
+                    }
+                }
+            }
+        }
     }
 
     private fun checkMetaData() {
