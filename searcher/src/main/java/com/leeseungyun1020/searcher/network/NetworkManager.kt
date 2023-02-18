@@ -2,6 +2,7 @@ package com.leeseungyun1020.searcher.network
 
 import android.util.Log
 import com.google.gson.Gson
+import com.leeseungyun1020.searcher.data.Image
 import com.leeseungyun1020.searcher.data.News
 import com.leeseungyun1020.searcher.utilities.TAG
 import com.leeseungyun1020.searcher.utilities.Type
@@ -80,6 +81,38 @@ object NetworkManager {
                 }
                 Type.KAKAO -> {
                     TODO("Kakao NEWS")
+                }
+            }
+        } catch (e: Exception) {
+            if (onFailure != null) {
+                onFailure("NetworkManager: ${e.message}")
+            } else {
+                Log.e(TAG, "NetworkManager: ${e.message}")
+            }
+        }
+    }
+
+    suspend fun loadImages(
+        keyword: String,
+        page: Int,
+        onSuccess: (imageList: List<Image>) -> Unit,
+        onFailure: ((message: String) -> Unit)? = null
+    ) {
+        try {
+            when (type) {
+                Type.NAVER -> {
+                    val response = getResponseFromUrl(
+                        Urls.NAVER_IMAGE
+                            .addQuery("query", keyword)
+                            .addQuery("display", "$imageDisplay")
+                            .addQuery("start", "${1 + imageDisplay * page}")
+                            .toString()
+                    )
+                    val naverImageResponse = Gson().fromJson(response, NaverImageResponse::class.java)
+                    onSuccess(naverImageResponse.items.map { it.toImage() })
+                }
+                Type.KAKAO -> {
+                    TODO("Kakao IMAGE")
                 }
             }
         } catch (e: Exception) {

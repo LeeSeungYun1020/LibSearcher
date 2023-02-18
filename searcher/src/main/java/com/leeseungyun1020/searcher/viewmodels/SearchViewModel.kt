@@ -44,8 +44,10 @@ class SearchViewModel : ViewModel() {
     private fun loadResult() {
         viewModelScope.launch {
             NetworkManager.loadNews(keyword.value, newsPage, {
-                Log.d(TAG, "loadResult: ${it.firstOrNull()}")
-                _newsResult.value += it
+                _newsResult.value = it
+            })
+            NetworkManager.loadImages(keyword.value, imagePage, {
+                _imageResult.value = it
             })
         }
     }

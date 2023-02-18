@@ -23,7 +23,7 @@ import com.leeseungyun1020.searcher.utilities.TAG
 import com.leeseungyun1020.searcher.viewmodels.SearchViewModel
 import kotlinx.coroutines.launch
 
-private const val CATEGORY = "param1"
+private const val CATEGORY = "category"
 
 class ResultFragment : Fragment() {
 
@@ -81,16 +81,10 @@ class ResultFragment : Fragment() {
                 }
             }
             ResultCategory.IMAGE -> {
-                val list = mutableListOf<Image>(
-                    Image(
-                        title = "title4",
-                        imageUrl = "https://rs.nxfs.nexon.com/gnb/images/logo_nexon.png",
-                        url = "https://www.nexon.com"
-                    )
-                )
+                val list = mutableListOf<Image>()
                 val imageAdapter = ImageAdapter(list)
                 binding.recyclerView.apply {
-                    layoutManager = GridLayoutManager(context, 5)
+                    layoutManager = GridLayoutManager(context, 3)
                     adapter = imageAdapter
                 }
                 viewLifecycleOwner.lifecycleScope.launch {
