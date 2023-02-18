@@ -22,6 +22,9 @@ import kotlinx.coroutines.launch
 
 class SearchActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySearchBinding
+    private val resultFragments =
+        ResultCategory.values().associateWith { ResultFragment.newInstance(it) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val viewModel: SearchViewModel by viewModels()
@@ -39,11 +42,14 @@ class SearchActivity : AppCompatActivity() {
         }
         setContentView(binding.root)
 
+
+
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.location.collect {
                     supportFragmentManager.commit {
-                        replace(R.id.result_container, ResultFragment.newInstance(it))
+                        replace(R.id.result_container,
+                            resultFragments.getOrElse(it) { ResultFragment.newInstance(it) })
                         setReorderingAllowed(true)
                         addToBackStack(it.name)
                     }
