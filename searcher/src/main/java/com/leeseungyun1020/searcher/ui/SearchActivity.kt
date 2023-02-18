@@ -19,18 +19,23 @@ import com.leeseungyun1020.searcher.utilities.Type
 import com.leeseungyun1020.searcher.viewmodels.SearchViewModel
 import com.nostra13.universalimageloader.core.ImageLoader
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration
+import com.nostra13.universalimageloader.utils.L
 import kotlinx.coroutines.launch
 
 class SearchActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySearchBinding
-    private val resultFragments =
-        ResultCategory.values().associateWith { ResultFragment.newInstance(it) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val viewModel: SearchViewModel by viewModels()
 
+        val resultFragments = ResultCategory.values().associateWith {
+            supportFragmentManager.findFragmentByTag(it.name) ?: ResultFragment.newInstance(it)
+        }
+
         ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(this))
+        L.writeLogs(false)
+
         checkMetaData()
 
         binding = ActivitySearchBinding.inflate(layoutInflater)
@@ -43,14 +48,14 @@ class SearchActivity : AppCompatActivity() {
         }
         setContentView(binding.root)
 
-
-
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.location.collect {
                     supportFragmentManager.commit {
                         replace(R.id.result_container,
-                            resultFragments.getOrElse(it) { ResultFragment.newInstance(it) })
+                            resultFragments.getOrElse(it) { ResultFragment.newInstance(it) },
+                            it.name
+                        )
                         setReorderingAllowed(true)
                         addToBackStack(it.name)
                     }
@@ -60,18 +65,16 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun checkMetaData() {
-        val metaData =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                packageManager.getApplicationInfo(
-                    packageName,
-                    PackageManager.ApplicationInfoFlags.of(PackageManager.GET_META_DATA.toLong())
-                ).metaData
-            } else {
-                packageManager.getApplicationInfo(
-                    packageName,
-                    PackageManager.GET_META_DATA
-                ).metaData
-            }
+        val metaData = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            packageManager.getApplicationInfo(
+                packageName,
+                PackageManager.ApplicationInfoFlags.of(PackageManager.GET_META_DATA.toLong())
+            ).metaData
+        } else {
+            packageManager.getApplicationInfo(
+                packageName, PackageManager.GET_META_DATA
+            ).metaData
+        }
         when (metaData.getString("com.leeseungyun1020.searcher.sdk.type")?.lowercase()) {
             "naver" -> {
                 val id = metaData.getString("com.leeseungyun1020.searcher.sdk.naver.id")
