@@ -33,7 +33,6 @@
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/result_container"
-            android:name="com.leeseungyun1020.searcher.ui.ResultFragment"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"

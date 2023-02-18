@@ -24,18 +24,19 @@
                 android:id="@+id/news_tab_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:contentDescription="@string/news"
                 android:src="@drawable/ic_newspaper_24" />
 
             <ImageButton
                 android:id="@+id/image_tab_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:contentDescription="@string/image"
                 android:src="@drawable/ic_image_24" />
         </LinearLayout>
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/result_container"
-            android:name="com.leeseungyun1020.searcher.ui.ResultFragment"
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
