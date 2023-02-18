@@ -1,6 +1,7 @@
 package com.leeseungyun1020.searcher.ui
 
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.viewModels
@@ -60,7 +61,17 @@ class SearchActivity : AppCompatActivity() {
 
     private fun checkMetaData() {
         val metaData =
-            packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA).metaData
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                packageManager.getApplicationInfo(
+                    packageName,
+                    PackageManager.ApplicationInfoFlags.of(PackageManager.GET_META_DATA.toLong())
+                ).metaData
+            } else {
+                packageManager.getApplicationInfo(
+                    packageName,
+                    PackageManager.GET_META_DATA
+                ).metaData
+            }
         when (metaData.getString("com.leeseungyun1020.searcher.sdk.type")?.lowercase()) {
             "naver" -> {
                 val id = metaData.getString("com.leeseungyun1020.searcher.sdk.naver.id")
