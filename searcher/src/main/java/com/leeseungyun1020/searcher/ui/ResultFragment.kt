@@ -1,5 +1,6 @@
 package com.leeseungyun1020.searcher.ui
 
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -28,12 +29,11 @@ private const val CATEGORY = "category"
 class ResultFragment : Fragment() {
 
     companion object {
-        fun newInstance(category: ResultCategory) =
-            ResultFragment().apply {
-                arguments = Bundle().apply {
-                    putSerializable(CATEGORY, category)
-                }
+        fun newInstance(category: ResultCategory) = ResultFragment().apply {
+            arguments = Bundle().apply {
+                putSerializable(CATEGORY, category)
             }
+        }
     }
 
     private var _binding: FragmentResultBinding? = null
@@ -52,8 +52,7 @@ class ResultFragment : Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentResultBinding.inflate(inflater, container, false)
         return binding.root
@@ -84,7 +83,13 @@ class ResultFragment : Fragment() {
                 val list = mutableListOf<Image>()
                 val imageAdapter = ImageAdapter(list)
                 binding.recyclerView.apply {
-                    layoutManager = GridLayoutManager(context, 3)
+                    layoutManager = GridLayoutManager(
+                        context, when (resources.configuration.orientation) {
+                            Configuration.ORIENTATION_PORTRAIT -> 3
+                            Configuration.ORIENTATION_LANDSCAPE -> 5
+                            else -> 3
+                        }
+                    )
                     adapter = imageAdapter
                 }
                 viewLifecycleOwner.lifecycleScope.launch {
