@@ -14,11 +14,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.leeseungyun1020.searcher.adapters.ImageAdapter
 import com.leeseungyun1020.searcher.adapters.NewsAdapter
 import com.leeseungyun1020.searcher.data.Image
 import com.leeseungyun1020.searcher.data.News
 import com.leeseungyun1020.searcher.databinding.FragmentResultBinding
+import com.leeseungyun1020.searcher.network.NetworkManager
+import com.leeseungyun1020.searcher.utilities.Mode
 import com.leeseungyun1020.searcher.utilities.ResultCategory
 import com.leeseungyun1020.searcher.utilities.TAG
 import com.leeseungyun1020.searcher.viewmodels.SearchViewModel
@@ -68,13 +71,35 @@ class ResultFragment : Fragment() {
                 binding.recyclerView.apply {
                     layoutManager = LinearLayoutManager(context)
                     adapter = newsAdapter
+                    addOnScrollListener(object: RecyclerView.OnScrollListener(){
+                        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                            super.onScrolled(recyclerView, dx, dy)
+
+                            val lastVisibleItemPosition = (layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
+                            val lastItemPosition = newsAdapter.itemCount - 1
+
+                            if (lastVisibleItemPosition == lastItemPosition) {
+                                viewModel.loadMoreNews()
+                            }
+                        }
+                    })
                 }
                 viewLifecycleOwner.lifecycleScope.launch {
                     repeatOnLifecycle(Lifecycle.State.STARTED) {
                         viewModel.newsResult.collect {
-                            val end = list.size
-                            list += it
-                            newsAdapter.notifyItemRangeInserted(end, list.size - end)
+                            when (it.mode) {
+                                Mode.ADD -> {
+                                    val start = list.size
+                                    val add = it.news.subList(start, it.news.size)
+                                    list += add
+                                    newsAdapter.notifyItemRangeInserted(start, add.size)
+                                }
+                                Mode.REPLACE -> {
+                                    list.clear()
+                                    list += it.news
+                                    newsAdapter.notifyDataSetChanged()
+                                }
+                            }
                         }
                     }
                 }
@@ -91,13 +116,35 @@ class ResultFragment : Fragment() {
                         }
                     )
                     adapter = imageAdapter
+                    addOnScrollListener(object: RecyclerView.OnScrollListener(){
+                        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                            super.onScrolled(recyclerView, dx, dy)
+
+                            val lastVisibleItemPosition = (layoutManager as GridLayoutManager).findLastVisibleItemPosition()
+                            val lastItemPosition = imageAdapter.itemCount - 1
+
+                            if (lastVisibleItemPosition == lastItemPosition) {
+                                viewModel.loadMoreImage()
+                            }
+                        }
+                    })
                 }
                 viewLifecycleOwner.lifecycleScope.launch {
                     repeatOnLifecycle(Lifecycle.State.STARTED) {
                         viewModel.imageResult.collect {
-                            val end = list.size
-                            list += it
-                            imageAdapter.notifyItemRangeInserted(end, list.size - end)
+                            when (it.mode) {
+                                Mode.ADD -> {
+                                    val start = list.size
+                                    val add = it.images.subList(start, it.images.size)
+                                    list += add
+                                    imageAdapter.notifyItemRangeInserted(start, add.size)
+                                }
+                                Mode.REPLACE -> {
+                                    list.clear()
+                                    list += it.images
+                                    imageAdapter.notifyDataSetChanged()
+                                }
+                            }
                         }
                     }
                 }
@@ -106,7 +153,6 @@ class ResultFragment : Fragment() {
                 Log.e(TAG, "ResultFragment onViewCreated: Not initialized")
             }
         }
-
     }
 
     override fun onDestroyView() {

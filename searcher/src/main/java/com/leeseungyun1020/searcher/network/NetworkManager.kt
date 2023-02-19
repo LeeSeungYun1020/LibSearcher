@@ -17,8 +17,6 @@ object NetworkManager {
     private var type = Type.NAVER
     private var id = ""
     private var pw = ""
-    private var newsDisplay = 30
-    private var imageDisplay = 30
 
     fun init(type: Type, id: String, pw: String) {
         this.type = type
@@ -63,6 +61,7 @@ object NetworkManager {
     suspend fun loadNews(
         keyword: String,
         page: Int,
+        display: Int,
         onSuccess: (newsList: List<News>) -> Unit,
         onFailure: ((message: String) -> Unit)? = null
     ) {
@@ -72,8 +71,8 @@ object NetworkManager {
                     val response = getResponseFromUrl(
                         Urls.NAVER_NEWS
                             .addQuery("query", keyword)
-                            .addQuery("display", "$newsDisplay")
-                            .addQuery("start", "${1 + newsDisplay * page}")
+                            .addQuery("display", "$display")
+                            .addQuery("start", "${1 + display * page}")
                             .toString()
                     )
                     val naverNewsResponse = Gson().fromJson(response, NaverNewsResponse::class.java)
@@ -95,6 +94,7 @@ object NetworkManager {
     suspend fun loadImages(
         keyword: String,
         page: Int,
+        display: Int,
         onSuccess: (imageList: List<Image>) -> Unit,
         onFailure: ((message: String) -> Unit)? = null
     ) {
@@ -104,8 +104,8 @@ object NetworkManager {
                     val response = getResponseFromUrl(
                         Urls.NAVER_IMAGE
                             .addQuery("query", keyword)
-                            .addQuery("display", "$imageDisplay")
-                            .addQuery("start", "${1 + imageDisplay * page}")
+                            .addQuery("display", "$display")
+                            .addQuery("start", "${1 + display * page}")
                             .toString()
                     )
                     val naverImageResponse = Gson().fromJson(response, NaverImageResponse::class.java)
