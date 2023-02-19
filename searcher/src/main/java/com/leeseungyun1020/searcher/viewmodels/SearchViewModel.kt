@@ -28,7 +28,7 @@ class SearchViewModel : ViewModel() {
     private var newsPage = 0
 
     fun search(keyword: String) {
-        if (keyword.isNotBlank()) {
+        if (keyword.isNotBlank() && keyword != _keyword.value) {
             _keyword.value = keyword
             newsPage = 0
             imagePage = 0

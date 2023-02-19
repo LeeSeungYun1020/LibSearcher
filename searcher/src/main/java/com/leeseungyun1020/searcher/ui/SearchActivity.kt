@@ -4,10 +4,12 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.text.TextUtils.replace
 import android.util.Log
 import android.view.KeyEvent
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat.getSystemService
@@ -30,6 +32,7 @@ import kotlinx.coroutines.launch
 class SearchActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySearchBinding
     private val viewModel: SearchViewModel by viewModels()
+    private var initial = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,19 +47,29 @@ class SearchActivity : AppCompatActivity() {
         L.writeLogs(false)
 
         initUi()
+        if (savedInstanceState == null) {
+            supportFragmentManager.commit {
+                setReorderingAllowed(true)
+                add(R.id.result_container, resultFragments[ResultCategory.NEWS]!!, ResultCategory.NEWS.name)
+            }
+        }
         setContentView(binding.root)
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.location.collect {
-                    supportFragmentManager.commit {
-                        replace(
-                            R.id.result_container,
-                            resultFragments.getOrElse(it) { ResultFragment.newInstance(it) },
-                            it.name
-                        )
-                        setReorderingAllowed(true)
-                        addToBackStack(it.name)
+                    if (initial) {
+                        initial = false
+                    } else {
+                        supportFragmentManager.commit {
+                            replace(
+                                R.id.result_container,
+                                resultFragments.getOrElse(it) { ResultFragment.newInstance(it) },
+                                it.name
+                            )
+                            setReorderingAllowed(true)
+                            addToBackStack(it.name)
+                        }
                     }
                 }
             }
