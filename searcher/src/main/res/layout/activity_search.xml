@@ -4,9 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <variable
-            name="viewModel"
-            type="com.leeseungyun1020.searcher.viewmodels.SearchViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -19,6 +16,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:hint="@string/msg_enter_keyword"
+            android:imeOptions="actionSearch"
             android:importantForAutofill="no"
             android:inputType="text"
             android:maxLines="1"
@@ -31,7 +29,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:contentDescription="@string/search"
-            android:onClick="@{() -> viewModel.search(searchBox.getText().toString())}"
             android:src="@drawable/ic_search_24"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/search_box"

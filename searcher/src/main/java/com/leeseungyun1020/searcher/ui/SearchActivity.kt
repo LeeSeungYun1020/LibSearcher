@@ -1,11 +1,16 @@
 package com.leeseungyun1020.searcher.ui
 
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.KeyEvent
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.commit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -24,35 +29,29 @@ import kotlinx.coroutines.launch
 
 class SearchActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySearchBinding
+    private val viewModel: SearchViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val viewModel: SearchViewModel by viewModels()
+        checkMetaData()
 
         val resultFragments = ResultCategory.values().associateWith {
             supportFragmentManager.findFragmentByTag(it.name) ?: ResultFragment.newInstance(it)
         }
+        binding = ActivitySearchBinding.inflate(layoutInflater)
 
         ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(this))
         L.writeLogs(false)
 
-        checkMetaData()
-
-        binding = ActivitySearchBinding.inflate(layoutInflater)
-        binding.viewModel = viewModel
-        binding.searchTab.newsTabButton.setOnClickListener {
-            viewModel.onCategoryButtonClicked(ResultCategory.NEWS)
-        }
-        binding.searchTab.imageTabButton.setOnClickListener {
-            viewModel.onCategoryButtonClicked(ResultCategory.IMAGE)
-        }
+        initUi()
         setContentView(binding.root)
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.location.collect {
                     supportFragmentManager.commit {
-                        replace(R.id.result_container,
+                        replace(
+                            R.id.result_container,
                             resultFragments.getOrElse(it) { ResultFragment.newInstance(it) },
                             it.name
                         )
@@ -100,5 +99,45 @@ class SearchActivity : AppCompatActivity() {
                 finish()
             }
         }
+    }
+
+    private fun initUi() {
+        binding.apply {
+            searchBox.apply {
+                setOnEditorActionListener { _, actionId, _ ->
+                    if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                        search()
+                        true
+                    } else {
+                        false
+                    }
+                }
+                setOnKeyListener { _, keyCode, keyEvent ->
+                    if (keyEvent.action == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_ENTER) {
+                        search()
+                        true
+                    } else {
+                        false
+                    }
+                }
+            }
+            searchButton.setOnClickListener {
+                search()
+            }
+            searchTab.apply {
+                newsTabButton.setOnClickListener {
+                    viewModel.onCategoryButtonClicked(ResultCategory.NEWS)
+                }
+                imageTabButton.setOnClickListener {
+                    viewModel.onCategoryButtonClicked(ResultCategory.IMAGE)
+                }
+            }
+        }
+    }
+
+    private fun search() {
+        viewModel.search(binding.searchBox.text.toString())
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(binding.searchBox.windowToken, 0)
     }
 }
