@@ -30,3 +30,15 @@
 - 키보드 한글 입력 문제
 ### 결과
 - EditText에서 한글 입력 후 엔터키 입력시에도 검색 정상 동작
+
+## fragment 여러 번 추가되는 문제
+### 문제
+- SearchActivity에서 동일 fragment가 여러 번 backstack에 추가됨
+### 수정
+- 시도
+  - savedInstanceState가 null인 경우에만 fragment를 manager에 add
+  - initial 변수를 추가하여 StateFlow가 처음 응답할 때 무시하도록 구현
+### 원인
+- stateFlow가 처음 started 상태로 접근할 때 collect로 수집됨
+### 결과
+- 첫 시작, 화면 회전시 동일 fragment가 여러 번 백스택에 추가되지 않도록 코드 수정
