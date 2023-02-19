@@ -18,13 +18,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.leeseungyun1020.searcher.adapters.ImageAdapter
 import com.leeseungyun1020.searcher.adapters.NewsAdapter
 import com.leeseungyun1020.searcher.data.Image
+import com.leeseungyun1020.searcher.data.ItemResult
 import com.leeseungyun1020.searcher.data.News
 import com.leeseungyun1020.searcher.databinding.FragmentResultBinding
-import com.leeseungyun1020.searcher.network.NetworkManager
 import com.leeseungyun1020.searcher.utilities.Mode
-import com.leeseungyun1020.searcher.utilities.ResultCategory
+import com.leeseungyun1020.searcher.utilities.Category
 import com.leeseungyun1020.searcher.utilities.TAG
 import com.leeseungyun1020.searcher.viewmodels.SearchViewModel
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 private const val CATEGORY = "category"
@@ -32,7 +33,7 @@ private const val CATEGORY = "category"
 class ResultFragment : Fragment() {
 
     companion object {
-        fun newInstance(category: ResultCategory) = ResultFragment().apply {
+        fun newInstance(category: Category) = ResultFragment().apply {
             arguments = Bundle().apply {
                 putSerializable(CATEGORY, category)
             }
@@ -41,15 +42,16 @@ class ResultFragment : Fragment() {
 
     private var _binding: FragmentResultBinding? = null
     private val binding get() = _binding!!
-    private var category: ResultCategory? = null
+    private val viewModel: SearchViewModel by activityViewModels()
+    private var category: Category? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
             category = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                it.getSerializable(CATEGORY, ResultCategory::class.java)
+                it.getSerializable(CATEGORY, Category::class.java)
             } else {
-                it.getSerializable(CATEGORY) as ResultCategory
+                it.getSerializable(CATEGORY) as Category
             }
         }
     }
@@ -62,95 +64,81 @@ class ResultFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val viewModel: SearchViewModel by activityViewModels()
         super.onViewCreated(view, savedInstanceState)
         when (category) {
-            ResultCategory.NEWS -> {
+            Category.NEWS -> {
                 val list = mutableListOf<News>()
-                val newsAdapter = NewsAdapter(list)
-                binding.recyclerView.apply {
-                    layoutManager = LinearLayoutManager(context)
-                    adapter = newsAdapter
-                    addOnScrollListener(object: RecyclerView.OnScrollListener(){
-                        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                            super.onScrolled(recyclerView, dx, dy)
-
-                            val lastVisibleItemPosition = (layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
-                            val lastItemPosition = newsAdapter.itemCount - 1
-
-                            if (lastVisibleItemPosition == lastItemPosition) {
-                                viewModel.loadMoreNews()
-                            }
-                        }
-                    })
-                }
-                viewLifecycleOwner.lifecycleScope.launch {
-                    repeatOnLifecycle(Lifecycle.State.STARTED) {
-                        viewModel.newsResult.collect {
-                            when (it.mode) {
-                                Mode.ADD -> {
-                                    val start = list.size
-                                    val add = it.news.subList(start, it.news.size)
-                                    list += add
-                                    newsAdapter.notifyItemRangeInserted(start, add.size)
-                                }
-                                Mode.REPLACE -> {
-                                    list.clear()
-                                    list += it.news
-                                    newsAdapter.notifyDataSetChanged()
-                                }
-                            }
-                        }
-                    }
-                }
+                initPagingRecyclerView(
+                    list = list,
+                    itemAdapter = NewsAdapter(list),
+                    itemLayoutManager = LinearLayoutManager(context),
+                    itemResult = viewModel.newsResult,
+                    loadMoreItem = { viewModel.loadMore(Category.NEWS) }
+                )
             }
-            ResultCategory.IMAGE -> {
+            Category.IMAGE -> {
                 val list = mutableListOf<Image>()
-                val imageAdapter = ImageAdapter(list)
-                binding.recyclerView.apply {
-                    layoutManager = GridLayoutManager(
+                initPagingRecyclerView(
+                    list = list,
+                    itemAdapter = ImageAdapter(list),
+                    itemLayoutManager = GridLayoutManager(
                         context, when (resources.configuration.orientation) {
                             Configuration.ORIENTATION_PORTRAIT -> 3
                             Configuration.ORIENTATION_LANDSCAPE -> 5
                             else -> 3
                         }
-                    )
-                    adapter = imageAdapter
-                    addOnScrollListener(object: RecyclerView.OnScrollListener(){
-                        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                            super.onScrolled(recyclerView, dx, dy)
-
-                            val lastVisibleItemPosition = (layoutManager as GridLayoutManager).findLastVisibleItemPosition()
-                            val lastItemPosition = imageAdapter.itemCount - 1
-
-                            if (lastVisibleItemPosition == lastItemPosition) {
-                                viewModel.loadMoreImage()
-                            }
-                        }
-                    })
-                }
-                viewLifecycleOwner.lifecycleScope.launch {
-                    repeatOnLifecycle(Lifecycle.State.STARTED) {
-                        viewModel.imageResult.collect {
-                            when (it.mode) {
-                                Mode.ADD -> {
-                                    val start = list.size
-                                    val add = it.images.subList(start, it.images.size)
-                                    list += add
-                                    imageAdapter.notifyItemRangeInserted(start, add.size)
-                                }
-                                Mode.REPLACE -> {
-                                    list.clear()
-                                    list += it.images
-                                    imageAdapter.notifyDataSetChanged()
-                                }
-                            }
-                        }
-                    }
-                }
+                    ),
+                    itemResult = viewModel.imageResult,
+                    loadMoreItem = { viewModel.loadMore(Category.IMAGE) }
+                )
             }
             null -> {
                 Log.e(TAG, "ResultFragment onViewCreated: Not initialized")
+            }
+        }
+    }
+
+    private fun <T> initPagingRecyclerView(
+        list: MutableList<T>,
+        itemAdapter: RecyclerView.Adapter<*>,
+        itemLayoutManager: RecyclerView.LayoutManager,
+        itemResult: StateFlow<ItemResult<T>>,
+        loadMoreItem: () -> Unit,
+    ) {
+        binding.recyclerView.apply {
+            layoutManager = itemLayoutManager
+            adapter = itemAdapter
+            addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+
+                    val lastVisibleItemPosition =
+                        (layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
+                    val lastItemPosition = itemAdapter.itemCount - 1
+
+                    if (lastVisibleItemPosition == lastItemPosition) {
+                        loadMoreItem()
+                    }
+                }
+            })
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                itemResult.collect {
+                    when (it.mode) {
+                        Mode.ADD -> {
+                            val start = list.size
+                            val add = it.items.subList(start, it.items.size)
+                            list += add
+                            itemAdapter.notifyItemRangeInserted(start, add.size)
+                        }
+                        Mode.REPLACE -> {
+                            list.clear()
+                            list += it.items
+                            itemAdapter.notifyDataSetChanged()
+                        }
+                    }
+                }
             }
         }
     }

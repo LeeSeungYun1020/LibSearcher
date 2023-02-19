@@ -1,5 +1,5 @@
 package com.leeseungyun1020.searcher.utilities
 
-enum class ResultCategory {
+enum class Category {
     NEWS, IMAGE
 }

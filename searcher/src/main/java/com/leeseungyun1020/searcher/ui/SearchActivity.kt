@@ -4,15 +4,12 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.text.TextUtils.replace
 import android.util.Log
 import android.view.KeyEvent
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.commit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -20,7 +17,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.leeseungyun1020.searcher.R
 import com.leeseungyun1020.searcher.databinding.ActivitySearchBinding
 import com.leeseungyun1020.searcher.network.NetworkManager
-import com.leeseungyun1020.searcher.utilities.ResultCategory
+import com.leeseungyun1020.searcher.utilities.Category
 import com.leeseungyun1020.searcher.utilities.TAG
 import com.leeseungyun1020.searcher.utilities.Type
 import com.leeseungyun1020.searcher.viewmodels.SearchViewModel
@@ -38,7 +35,7 @@ class SearchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         checkMetaData()
 
-        val resultFragments = ResultCategory.values().associateWith {
+        val resultFragments = Category.values().associateWith {
             supportFragmentManager.findFragmentByTag(it.name) ?: ResultFragment.newInstance(it)
         }
         binding = ActivitySearchBinding.inflate(layoutInflater)
@@ -50,7 +47,7 @@ class SearchActivity : AppCompatActivity() {
         if (savedInstanceState == null) {
             supportFragmentManager.commit {
                 setReorderingAllowed(true)
-                add(R.id.result_container, resultFragments[ResultCategory.NEWS]!!, ResultCategory.NEWS.name)
+                add(R.id.result_container, resultFragments[Category.NEWS]!!, Category.NEWS.name)
             }
         }
         setContentView(binding.root)
@@ -139,10 +136,10 @@ class SearchActivity : AppCompatActivity() {
             }
             searchTab.apply {
                 newsTabButton.setOnClickListener {
-                    viewModel.onCategoryButtonClicked(ResultCategory.NEWS)
+                    viewModel.onCategoryButtonClicked(Category.NEWS)
                 }
                 imageTabButton.setOnClickListener {
-                    viewModel.onCategoryButtonClicked(ResultCategory.IMAGE)
+                    viewModel.onCategoryButtonClicked(Category.IMAGE)
                 }
             }
         }

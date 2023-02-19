@@ -3,13 +3,10 @@ package com.leeseungyun1020.searcher.viewmodels
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.leeseungyun1020.searcher.data.Image
-import com.leeseungyun1020.searcher.data.ImageResult
-import com.leeseungyun1020.searcher.data.News
-import com.leeseungyun1020.searcher.data.NewsResult
+import com.leeseungyun1020.searcher.data.*
 import com.leeseungyun1020.searcher.network.NetworkManager
 import com.leeseungyun1020.searcher.utilities.Mode
-import com.leeseungyun1020.searcher.utilities.ResultCategory
+import com.leeseungyun1020.searcher.utilities.Category
 import com.leeseungyun1020.searcher.utilities.TAG
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,91 +16,121 @@ class SearchViewModel : ViewModel() {
     private val _keyword = MutableStateFlow("")
     val keyword = _keyword.asStateFlow()
 
-    private val _location = MutableStateFlow(ResultCategory.NEWS)
+    private val _location = MutableStateFlow(Category.NEWS)
     val location = _location.asStateFlow()
 
-    private val _imageResult = MutableStateFlow(ImageResult(emptyList(), Mode.REPLACE, 0))
+    private val _imageResult = MutableStateFlow(ItemResult<Image>(emptyList(), Mode.REPLACE))
     val imageResult = _imageResult.asStateFlow()
-    private var imagePage = 0
-    private var canImageLoading = true
-    private val imageDisplay = 30
+    private val _imagePagingOptions = PagingOptions(30, 0, true)
 
-    private val _newsResult = MutableStateFlow(NewsResult(emptyList(), Mode.REPLACE, 0))
+    private val _newsResult = MutableStateFlow(ItemResult<News>(emptyList(), Mode.REPLACE))
     val newsResult = _newsResult.asStateFlow()
-    private var newsPage = 0
-    private var canNewsLoading = true
-    private val newsDisplay = 30
+    private val _newsPagingOptions = PagingOptions(30, 0, true)
 
     fun search(keyword: String) {
         if (keyword.isNotBlank() && keyword != _keyword.value) {
             _keyword.value = keyword
-            newsPage = 0
-            imagePage = 0
-            canImageLoading = true
-            canNewsLoading = true
+            _newsPagingOptions.reset()
+            _imagePagingOptions.reset()
             loadResult()
         }
     }
 
-    fun onCategoryButtonClicked(category: ResultCategory) {
-        if (location.value != category)
-            _location.value = category
+    fun onCategoryButtonClicked(category: Category) {
+        if (location.value != category) _location.value = category
     }
 
     private fun loadResult() {
         viewModelScope.launch {
-            canImageLoading = false
-            canNewsLoading = false
-            NetworkManager.loadNews(keyword.value, 0, newsDisplay, {
-                _newsResult.value = NewsResult(it, Mode.REPLACE, 0)
-                if (it.size == newsDisplay) {
-                    canNewsLoading = true
+            _imagePagingOptions.lock()
+            _newsPagingOptions.lock()
+            NetworkManager.loadNews(keyword.value, 0, _newsPagingOptions.display, {
+                _newsResult.value = ItemResult(it, Mode.REPLACE)
+                if (it.size == _newsPagingOptions.display) {
+                    _newsPagingOptions.unlock()
                 }
             })
-            NetworkManager.loadImages(keyword.value, 0, imageDisplay, {
-                _imageResult.value = ImageResult(it, Mode.REPLACE, 0)
-                if (it.size == imageDisplay) {
-                    canImageLoading = true
+            NetworkManager.loadImages(keyword.value, 0, _imagePagingOptions.display, {
+                _imageResult.value = ItemResult(it, Mode.REPLACE)
+                if (it.size == _imagePagingOptions.display) {
+                    _imagePagingOptions.unlock()
                 }
             })
         }
     }
 
-    fun loadMoreImage() {
+    fun loadMore(category: Category) {
+        val pagingOptions = when (category) {
+            Category.NEWS -> _newsPagingOptions
+            Category.IMAGE -> _imagePagingOptions
+        }
+
         viewModelScope.launch {
-            if (canImageLoading) {
-                Log.d(TAG, "loadMoreImage: $imagePage")
-                canImageLoading = false
-                imagePage += 1
-                NetworkManager.loadImages(keyword.value, imagePage, imageDisplay, {
-                    if (it.isNotEmpty()) {
-                        val prev = imageResult.value.images
-                        _imageResult.value = ImageResult(prev + it, Mode.ADD, prev.size)
+            if (pagingOptions.canLoading) {
+                pagingOptions.lock()
+                pagingOptions.nextPage()
+
+                when (category) {
+                    Category.NEWS -> {
+                        NetworkManager.loadNews(
+                            keyword.value,
+                            pagingOptions.page,
+                            pagingOptions.display,
+                            {
+                                if (it.isNotEmpty()) {
+                                    val prev = _newsResult.value.items
+                                    _newsResult.value = ItemResult(prev + it, Mode.ADD)
+                                }
+                                if (it.size == pagingOptions.display) {
+                                    pagingOptions.unlock()
+                                }
+                            })
                     }
-                    if (it.size == imageDisplay) {
-                        canImageLoading = true
+                    Category.IMAGE -> {
+                        NetworkManager.loadImages(
+                            keyword.value,
+                            pagingOptions.page,
+                            pagingOptions.display,
+                            {
+                                if (it.isNotEmpty()) {
+                                    val prev = _imageResult.value.items
+                                    _imageResult.value = ItemResult(prev + it, Mode.ADD)
+                                }
+                                if (it.size == pagingOptions.display) {
+                                    pagingOptions.unlock()
+                                }
+                            })
                     }
-                })
+                }
             }
         }
     }
 
-    fun loadMoreNews() {
-        viewModelScope.launch {
-            if (canNewsLoading) {
-                canNewsLoading = false
-                newsPage += 1
-                NetworkManager.loadNews(keyword.value, newsPage, newsDisplay, {
-                    if (it.isNotEmpty()) {
-                        val prev = newsResult.value.news
-                        _newsResult.value = NewsResult(prev + it, Mode.ADD, prev.size)
-                    }
-                    if (it.size == newsDisplay) {
-                        canNewsLoading = true
-                    }
-                })
-            }
+    private class PagingOptions(
+        val display: Int,
+        page: Int,
+        canLoading: Boolean,
+    ) {
+        var page = page
+            private set
+        var canLoading = canLoading
+            private set
+
+        fun reset() {
+            page = 0
+            canLoading = true
+        }
+
+        fun lock() {
+            canLoading = false
+        }
+
+        fun unlock() {
+            canLoading = true
+        }
+
+        fun nextPage() {
+            page += 1
         }
     }
-
 }
