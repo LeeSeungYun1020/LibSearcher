@@ -36,11 +36,12 @@ fun checkMetaData(
             }
         }
         "daum", "kakao" -> {
-            val key = metaData.getString("com.leeseungyun1020.searcher.sdk.kakao.key")
-            if (key.isNullOrEmpty()) {
-                onError("Kakao key")
+            val app = metaData.getString("com.leeseungyun1020.searcher.sdk.kakao.app")
+            val api = metaData.getString("com.leeseungyun1020.searcher.sdk.kakao.api")
+            if (app.isNullOrEmpty() || api.isNullOrEmpty()) {
+                onError("Kakao app/api key")
             } else {
-                onSuccess(MetaData(Type.KAKAO, "", key))
+                onSuccess(MetaData(Type.KAKAO, app, api))
             }
         }
         else -> {

@@ -25,10 +25,24 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
+        <activity
+            android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="oauth"
+                    android:scheme="kakao" />
+            </intent-filter>
+        </activity>
 
         <meta-data
             android:name="com.leeseungyun1020.searcher.sdk.type"
-            android:value="naver" />
+            android:value="kakao" />
         <meta-data
             android:name="com.leeseungyun1020.searcher.sdk.naver.id"
             android:value="" />
@@ -36,7 +50,10 @@
             android:name="com.leeseungyun1020.searcher.sdk.naver.pw"
             android:value="" />
         <meta-data
-            android:name="com.leeseungyun1020.searcher.sdk.kakao.key"
+            android:name="com.leeseungyun1020.searcher.sdk.kakao.app"
+            android:value="" />
+        <meta-data
+            android:name="com.leeseungyun1020.searcher.sdk.kakao.api"
             android:value="" />
     </application>
 
