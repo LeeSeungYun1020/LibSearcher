@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
+        <import type="android.text.Html" />
         <variable
             name="news"
             type="com.leeseungyun1020.searcher.data.News" />
@@ -42,7 +42,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:maxLines="1"
-            android:text="@{news.title}"
+            android:text="@{Html.fromHtml(news.title)}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/image"
             app:layout_constraintTop_toBottomOf="@id/date"
@@ -54,7 +54,7 @@
             android:layout_marginStart="8dp"
             android:ellipsize="end"
             android:maxLines="2"
-            android:text="@{news.contents}"
+            android:text="@{Html.fromHtml(news.contents)}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/image"
             app:layout_constraintTop_toBottomOf="@id/title"
