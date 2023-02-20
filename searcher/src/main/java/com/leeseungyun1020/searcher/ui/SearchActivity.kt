@@ -1,8 +1,6 @@
 package com.leeseungyun1020.searcher.ui
 
 import android.content.Context
-import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.KeyEvent
@@ -20,6 +18,7 @@ import com.leeseungyun1020.searcher.network.NetworkManager
 import com.leeseungyun1020.searcher.utilities.Category
 import com.leeseungyun1020.searcher.utilities.TAG
 import com.leeseungyun1020.searcher.utilities.Type
+import com.leeseungyun1020.searcher.utilities.checkMetaData
 import com.leeseungyun1020.searcher.viewmodels.SearchViewModel
 import com.nostra13.universalimageloader.core.ImageLoader
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration
@@ -33,7 +32,17 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        checkMetaData()
+        checkMetaData(packageManager, packageName,
+            onSuccess = { metaData ->
+                when (metaData.type) {
+                    Type.NAVER -> NetworkManager.init(Type.NAVER, metaData.id, metaData.pw)
+                    Type.KAKAO -> NetworkManager.init(Type.KAKAO, metaData.pw)
+                }
+            },
+            onError = {
+                Log.e(TAG, "SearchActivity checkMetaData: $it")
+                finish()
+            })
 
         val resultFragments = Category.values().associateWith {
             supportFragmentManager.findFragmentByTag(it.name) ?: ResultFragment.newInstance(it)
@@ -73,44 +82,6 @@ class SearchActivity : AppCompatActivity() {
                         }
                     }
                 }
-            }
-        }
-    }
-
-    private fun checkMetaData() {
-        val metaData = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            packageManager.getApplicationInfo(
-                packageName,
-                PackageManager.ApplicationInfoFlags.of(PackageManager.GET_META_DATA.toLong())
-            ).metaData
-        } else {
-            packageManager.getApplicationInfo(
-                packageName, PackageManager.GET_META_DATA
-            ).metaData
-        }
-        when (metaData.getString("com.leeseungyun1020.searcher.sdk.type")?.lowercase()) {
-            "naver" -> {
-                val id = metaData.getString("com.leeseungyun1020.searcher.sdk.naver.id")
-                val pw = metaData.getString("com.leeseungyun1020.searcher.sdk.naver.pw")
-                if (id.isNullOrEmpty() || pw.isNullOrEmpty()) {
-                    Log.e(TAG, "checkMetaData: Input meta-data: naver id/pw")
-                    finish()
-                } else {
-                    NetworkManager.init(Type.NAVER, id, pw)
-                }
-            }
-            "daum", "kakao" -> {
-                val key = metaData.getString("com.leeseungyun1020.searcher.sdk.kakao.key")
-                if (key.isNullOrEmpty()) {
-                    Log.e(TAG, "checkMetaData: Input meta-data: kakao key")
-                    finish()
-                } else {
-                    NetworkManager.init(Type.KAKAO, key)
-                }
-            }
-            else -> {
-                Log.e(TAG, "checkMetaData: Input meta-data: type")
-                finish()
             }
         }
     }
