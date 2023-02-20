@@ -29,7 +29,7 @@ object NetworkManager {
         this.pw = pw
     }
 
-    suspend fun getResponseFromUrl(url: String): String = withContext(Dispatchers.IO) {
+    private suspend fun getResponseFromUrl(url: String): String = withContext(Dispatchers.IO) {
         val connection = URL(url).openConnection() as HttpURLConnection
         connection.apply {
             requestMethod = "GET"
@@ -39,7 +39,7 @@ object NetworkManager {
                     connection.setRequestProperty("X-Naver-Client-Secret", pw)
                 }
                 Type.KAKAO -> {
-                    TODO("KAKAO SETTING")
+                    connection.setRequestProperty("Authorization", "KakaoAK $pw")
                 }
             }
             connect()
@@ -47,6 +47,13 @@ object NetworkManager {
 
         val responseCode = connection.responseCode
         if (responseCode != HttpURLConnection.HTTP_OK) {
+            connection.errorStream?.let {
+                val inputReader = BufferedReader(InputStreamReader(it))
+                val response = inputReader.use(BufferedReader::readText)
+                inputReader.close()
+                connection.disconnect()
+                Log.e(TAG, "NetworkManager: $response")
+            }
             throw Exception("HTTP request failed, error code: $responseCode")
         }
 
@@ -79,8 +86,17 @@ object NetworkManager {
                     onSuccess(naverNewsResponse.items.map { it.toNews() })
                 }
                 Type.KAKAO -> {
-                    TODO("Kakao NEWS")
+                    val response = getResponseFromUrl(
+                        Urls.KAKAO_WEB
+                            .addQuery("query", keyword)
+                            .addQuery("page", "${page + 1}")
+                            .addQuery("size", "$display")
+                            .toString()
+                    )
+                    val kakaoWebResponse = Gson().fromJson(response, KakaoNewsResponse::class.java)
+                    onSuccess(kakaoWebResponse.items.map { it.toNews() })
                 }
+
             }
         } catch (e: Exception) {
             if (onFailure != null) {
@@ -112,7 +128,16 @@ object NetworkManager {
                     onSuccess(naverImageResponse.items.map { it.toImage() })
                 }
                 Type.KAKAO -> {
-                    TODO("Kakao IMAGE")
+                    val response = getResponseFromUrl(
+                        Urls.KAKAO_IMAGE
+                            .addQuery("query", keyword)
+                            .addQuery("page", "${page + 1}")
+                            .addQuery("size", "$display")
+                            .toString()
+                    )
+                    val kakaoImageResponse =
+                        Gson().fromJson(response, KakaoImageResponse::class.java)
+                    onSuccess(kakaoImageResponse.items.map { it.toImage() })
                 }
             }
         } catch (e: Exception) {
