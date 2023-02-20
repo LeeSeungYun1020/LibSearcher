@@ -96,6 +96,9 @@ class ResultFragment : Fragment() {
                 Log.e(TAG, "ResultFragment onViewCreated: Not initialized")
             }
         }
+        if (viewModel.location.value.category != category) {
+            category?.let { viewModel.onPopFromBackstack(it) }
+        }
     }
 
     private fun <T> initPagingRecyclerView(

@@ -54,18 +54,22 @@ class SearchActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.location.collect {
+                viewModel.location.collect { location ->
                     if (initial) {
                         initial = false
-                    } else {
+                    } else if (location.move) {
                         supportFragmentManager.commit {
                             replace(
                                 R.id.result_container,
-                                resultFragments.getOrElse(it) { ResultFragment.newInstance(it) },
-                                it.name
+                                resultFragments.getOrElse(location.category) {
+                                    ResultFragment.newInstance(
+                                        location.category
+                                    )
+                                },
+                                location.category.name
                             )
                             setReorderingAllowed(true)
-                            addToBackStack(it.name)
+                            addToBackStack(location.category.name)
                         }
                     }
                 }

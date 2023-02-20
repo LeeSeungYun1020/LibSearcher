@@ -16,7 +16,7 @@ class SearchViewModel : ViewModel() {
     private val _keyword = MutableStateFlow("")
     val keyword = _keyword.asStateFlow()
 
-    private val _location = MutableStateFlow(Category.NEWS)
+    private val _location = MutableStateFlow(Location(Category.NEWS, true))
     val location = _location.asStateFlow()
 
     private val _imageResult = MutableStateFlow(ItemResult<Image>(emptyList(), Mode.REPLACE))
@@ -37,7 +37,11 @@ class SearchViewModel : ViewModel() {
     }
 
     fun onCategoryButtonClicked(category: Category) {
-        if (location.value != category) _location.value = category
+        if (location.value.category != category) _location.value = Location(category, true)
+    }
+
+    fun onPopFromBackstack(category: Category) {
+        _location.value = Location(category, false)
     }
 
     private fun loadResult() {
@@ -113,6 +117,11 @@ class SearchViewModel : ViewModel() {
             Category.NEWS -> _newsResult.value = ItemResult(_newsResult.value.items, Mode.COMPLETE)
         }
     }
+
+    class Location(
+        val category: Category,
+        val move: Boolean
+    )
 
     private class PagingOptions(
         val display: Int,
