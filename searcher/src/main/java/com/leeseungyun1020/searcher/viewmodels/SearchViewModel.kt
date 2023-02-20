@@ -1,13 +1,13 @@
 package com.leeseungyun1020.searcher.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.leeseungyun1020.searcher.data.*
+import com.leeseungyun1020.searcher.data.Image
+import com.leeseungyun1020.searcher.data.ItemResult
+import com.leeseungyun1020.searcher.data.News
 import com.leeseungyun1020.searcher.network.NetworkManager
-import com.leeseungyun1020.searcher.utilities.Mode
 import com.leeseungyun1020.searcher.utilities.Category
-import com.leeseungyun1020.searcher.utilities.TAG
+import com.leeseungyun1020.searcher.utilities.Mode
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -103,6 +103,14 @@ class SearchViewModel : ViewModel() {
                     }
                 }
             }
+        }
+    }
+
+    fun loadComplete(category: Category) {
+        when (category) {
+            Category.IMAGE -> _imageResult.value =
+                ItemResult(_imageResult.value.items, Mode.COMPLETE)
+            Category.NEWS -> _newsResult.value = ItemResult(_newsResult.value.items, Mode.COMPLETE)
         }
     }
 

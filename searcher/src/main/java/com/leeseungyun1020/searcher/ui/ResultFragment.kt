@@ -21,8 +21,8 @@ import com.leeseungyun1020.searcher.data.Image
 import com.leeseungyun1020.searcher.data.ItemResult
 import com.leeseungyun1020.searcher.data.News
 import com.leeseungyun1020.searcher.databinding.FragmentResultBinding
-import com.leeseungyun1020.searcher.utilities.Mode
 import com.leeseungyun1020.searcher.utilities.Category
+import com.leeseungyun1020.searcher.utilities.Mode
 import com.leeseungyun1020.searcher.utilities.TAG
 import com.leeseungyun1020.searcher.viewmodels.SearchViewModel
 import kotlinx.coroutines.flow.StateFlow
@@ -131,11 +131,20 @@ class ResultFragment : Fragment() {
                             val add = it.items.subList(start, it.items.size)
                             list += add
                             itemAdapter.notifyItemRangeInserted(start, add.size)
+                            category?.let { cat -> viewModel.loadComplete(cat) }
                         }
                         Mode.REPLACE -> {
                             list.clear()
                             list += it.items
                             itemAdapter.notifyDataSetChanged()
+                            binding.recyclerView.scrollToPosition(0)
+                            category?.let { cat -> viewModel.loadComplete(cat) }
+                        }
+                        Mode.COMPLETE -> {
+                            if (list.isEmpty()) {
+                                list += it.items
+                                itemAdapter.notifyItemRangeInserted(0, list.size)
+                            }
                         }
                     }
                 }
