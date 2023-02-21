@@ -1,8 +1,10 @@
 package com.leeseungyun1020.searcher.adapters
 
 import android.content.Intent
+import android.graphics.Rect
 import android.net.Uri
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.leeseungyun1020.searcher.data.News
@@ -44,5 +46,24 @@ class NewsAdapter(private val list: List<News>) :
 
     override fun getItemCount(): Int {
         return list.size
+    }
+}
+
+class NewsDecoration(private val verticalSpacing: Int, private val horizontalSpacing: Int) :
+    RecyclerView.ItemDecoration() {
+    override fun getItemOffsets(
+        outRect: Rect,
+        view: View,
+        parent: RecyclerView,
+        state: RecyclerView.State
+    ) {
+        val position = parent.getChildAdapterPosition(view)
+        outRect.top = verticalSpacing
+        outRect.left = horizontalSpacing
+        outRect.right = horizontalSpacing
+        outRect.bottom = verticalSpacing
+        if (position == 0) {
+            outRect.top = verticalSpacing * 2
+        }
     }
 }

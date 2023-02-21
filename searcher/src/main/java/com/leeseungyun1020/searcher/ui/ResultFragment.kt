@@ -16,7 +16,9 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.leeseungyun1020.searcher.adapters.ImageAdapter
+import com.leeseungyun1020.searcher.adapters.ImageDecoration
 import com.leeseungyun1020.searcher.adapters.NewsAdapter
+import com.leeseungyun1020.searcher.adapters.NewsDecoration
 import com.leeseungyun1020.searcher.data.Image
 import com.leeseungyun1020.searcher.data.ItemResult
 import com.leeseungyun1020.searcher.data.News
@@ -27,6 +29,7 @@ import com.leeseungyun1020.searcher.utilities.TAG
 import com.leeseungyun1020.searcher.viewmodels.SearchViewModel
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 private const val CATEGORY = "category"
 
@@ -72,22 +75,31 @@ class ResultFragment : Fragment() {
                     list = list,
                     itemAdapter = NewsAdapter(list),
                     itemLayoutManager = LinearLayoutManager(context),
+                    itemDecoration = NewsDecoration(
+                        (4 * resources.displayMetrics.density).roundToInt(),
+                        (8 * resources.displayMetrics.density).roundToInt()
+                    ),
                     itemResult = viewModel.newsResult,
                     loadMoreItem = { viewModel.loadMore(Category.NEWS) }
                 )
             }
             Category.IMAGE -> {
                 val list = mutableListOf<Image>()
+                val spanCount = when (resources.configuration.orientation) {
+                    Configuration.ORIENTATION_PORTRAIT -> 3
+                    Configuration.ORIENTATION_LANDSCAPE -> 5
+                    else -> 3
+                }
                 initPagingRecyclerView(
                     list = list,
                     itemAdapter = ImageAdapter(list),
-                    itemLayoutManager = GridLayoutManager(
-                        context, when (resources.configuration.orientation) {
-                            Configuration.ORIENTATION_PORTRAIT -> 3
-                            Configuration.ORIENTATION_LANDSCAPE -> 5
-                            else -> 3
-                        }
+                    itemLayoutManager = GridLayoutManager(context, spanCount),
+                    itemDecoration = ImageDecoration(
+                        spanCount,
+                        (8 * resources.displayMetrics.density).roundToInt(),
+                        (4 * resources.displayMetrics.density).roundToInt()
                     ),
+
                     itemResult = viewModel.imageResult,
                     loadMoreItem = { viewModel.loadMore(Category.IMAGE) }
                 )
@@ -105,6 +117,7 @@ class ResultFragment : Fragment() {
         list: MutableList<T>,
         itemAdapter: RecyclerView.Adapter<*>,
         itemLayoutManager: RecyclerView.LayoutManager,
+        itemDecoration: RecyclerView.ItemDecoration,
         itemResult: StateFlow<ItemResult<T>>,
         loadMoreItem: () -> Unit,
     ) {
@@ -124,6 +137,7 @@ class ResultFragment : Fragment() {
                     }
                 }
             })
+            addItemDecoration(itemDecoration)
         }
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
