@@ -14,22 +14,26 @@
         <EditText
             android:id="@+id/search_box"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:hint="@string/msg_enter_keyword"
             android:imeOptions="actionSearch"
             android:importantForAutofill="no"
             android:inputType="text"
             android:maxLines="1"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="4dp"
             app:layout_constraintEnd_toStartOf="@id/search_button"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageButton
             android:id="@+id/search_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="8dp"
             android:contentDescription="@string/search"
             android:src="@drawable/ic_search_24"
+            android:background="@drawable/custom_icon_button"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/search_box"
             app:layout_constraintTop_toTopOf="parent" />
