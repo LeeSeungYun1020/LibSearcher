@@ -14,8 +14,9 @@
         <Button
             android:id="@+id/news_tab_button"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:drawableStart="@drawable/ic_newspaper_24"
+            android:layout_height="64dp"
+            android:background="@null"
+            android:drawableTop="@drawable/ic_newspaper_24"
             android:text="@string/news"
             app:layout_constraintEnd_toStartOf="@id/image_tab_button"
             app:layout_constraintStart_toStartOf="parent"
@@ -24,8 +25,9 @@
         <Button
             android:id="@+id/image_tab_button"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:drawableStart="@drawable/ic_image_24"
+            android:layout_height="64dp"
+            android:background="@null"
+            android:drawableTop="@drawable/ic_image_24"
             android:text="@string/image"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/news_tab_button"
