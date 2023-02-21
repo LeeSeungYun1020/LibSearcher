@@ -3,4 +3,5 @@
     <color name="card_background">#FF424242</color>
     <color name="card_border">#37000000</color>
     <color name="icon_button_border">#37000000</color>
+    <color name="text_field_border">#37000000</color>
 </resources>

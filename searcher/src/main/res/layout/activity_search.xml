@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
-    </data>
+    <data></data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -14,14 +13,16 @@
         <EditText
             android:id="@+id/search_box"
             android:layout_width="0dp"
-            android:layout_height="48dp"
+            android:layout_height="56dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/custom_text_field"
             android:hint="@string/msg_enter_keyword"
             android:imeOptions="actionSearch"
             android:importantForAutofill="no"
             android:inputType="text"
             android:maxLines="1"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="4dp"
             app:layout_constraintEnd_toStartOf="@id/search_button"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -31,18 +32,20 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginEnd="8dp"
+            android:background="@drawable/custom_icon_button"
             android:contentDescription="@string/search"
             android:src="@drawable/ic_search_24"
-            android:background="@drawable/custom_icon_button"
+            app:layout_constraintBottom_toBottomOf="@id/search_box"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/search_box"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="@id/search_box" />
 
         <include
             android:id="@+id/search_tab"
             layout="@layout/search_tab"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_marginTop="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
