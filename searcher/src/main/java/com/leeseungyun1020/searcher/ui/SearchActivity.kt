@@ -106,16 +106,26 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun search() {
-        TypeSelectDialogFragment(
-            types = (application as MainApplication).supportSearchTypes,
-            titleId = R.string.search,
-            emptyMessageId = R.string.search_unsupported_error,
-            onSelect = { type ->
-                NetworkManager.changeType(type)
-                viewModel.search(binding.searchBox.text.toString())
-                val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                imm.hideSoftInputFromWindow(binding.searchBox.windowToken, 0)
+        val types = (application as MainApplication).supportSearchTypes
+        if (types.size == 1) {
+            val keyword = binding.searchBox.text.toString()
+            if (viewModel.keyword.value != keyword) {
+                viewModel.search(keyword)
             }
-        ).show(supportFragmentManager, "search")
+            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(binding.searchBox.windowToken, 0)
+        } else {
+            TypeSelectDialogFragment(
+                types = types,
+                titleId = R.string.search,
+                emptyMessageId = R.string.search_unsupported_error,
+                onSelect = { type ->
+                    NetworkManager.changeType(type)
+                    viewModel.search(binding.searchBox.text.toString())
+                    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.hideSoftInputFromWindow(binding.searchBox.windowToken, 0)
+                }
+            ).show(supportFragmentManager, "search")
+        }
     }
 }
