@@ -2,12 +2,21 @@ package com.leeseungyun1020.searcher.ui
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
+import android.util.TypedValue
 import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.Button
+import android.widget.ImageButton
 import androidx.activity.viewModels
+import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.BlendModeColorFilterCompat
+import androidx.core.graphics.BlendModeCompat
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -17,6 +26,7 @@ import com.leeseungyun1020.searcher.R
 import com.leeseungyun1020.searcher.databinding.ActivitySearchBinding
 import com.leeseungyun1020.searcher.network.NetworkManager
 import com.leeseungyun1020.searcher.utilities.Category
+import com.leeseungyun1020.searcher.utilities.TAG
 import com.leeseungyun1020.searcher.viewmodels.SearchViewModel
 import com.nostra13.universalimageloader.core.ImageLoader
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration
@@ -25,12 +35,13 @@ import kotlinx.coroutines.launch
 
 class SearchActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySearchBinding
+    private lateinit var resultFragments: Map<Category, Fragment>
     private val viewModel: SearchViewModel by viewModels()
     private var initial = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val resultFragments = Category.values().associateWith {
+        resultFragments = Category.values().associateWith {
             supportFragmentManager.findFragmentByTag(it.name) ?: ResultFragment.newInstance(it)
         }
         binding = ActivitySearchBinding.inflate(layoutInflater)
@@ -46,41 +57,7 @@ class SearchActivity : AppCompatActivity() {
                 add(R.id.result_container, resultFragments[Category.NEWS]!!, Category.NEWS.name)
             }
         }
-
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.location.collect { location ->
-                    if (initial) {
-                        initial = false
-                    } else if (location.move) {
-                        supportFragmentManager.commit {
-                            replace(
-                                R.id.result_container,
-                                resultFragments.getOrElse(location.category) {
-                                    ResultFragment.newInstance(
-                                        location.category
-                                    )
-                                },
-                                location.category.name
-                            )
-                            setReorderingAllowed(true)
-                            addToBackStack(location.category.name)
-                        }
-                    }
-                }
-            }
-        }
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.tabVisibility.collect { isVisible ->
-                    binding.searchTab.tabGroup?.visibility = if (isVisible) {
-                        View.VISIBLE
-                    } else {
-                        View.GONE
-                    }
-                }
-            }
-        }
+        observeChanges()
     }
 
     private fun initUi() {
@@ -139,5 +116,84 @@ class SearchActivity : AppCompatActivity() {
                 }
             ).show(supportFragmentManager, "search")
         }
+    }
+
+    private fun observeChanges() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.location.collect { location ->
+                    if (initial) {
+                        initial = false
+                    } else if (location.move) {
+                        supportFragmentManager.commit {
+                            replace(
+                                R.id.result_container,
+                                resultFragments.getOrElse(location.category) {
+                                    ResultFragment.newInstance(
+                                        location.category
+                                    )
+                                },
+                                location.category.name
+                            )
+                            setReorderingAllowed(true)
+                            addToBackStack(location.category.name)
+                        }
+                    }
+
+                    when (location.category) {
+                        Category.NEWS -> {
+                            binding.searchTab.apply {
+                                selectTabItem(newsTabButton, newsTabButtonIndicator)
+                                deselectTabItem(imageTabButton, imageTabButtonIndicator)
+                            }
+                        }
+                        Category.IMAGE -> {
+                            binding.searchTab.apply {
+                                deselectTabItem(newsTabButton, newsTabButtonIndicator)
+                                selectTabItem(imageTabButton, imageTabButtonIndicator)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.tabVisibility.collect { isVisible ->
+//                    binding.searchTab.tabGroup?.visibility = if (isVisible) {
+//                        View.VISIBLE
+//                    } else {
+//                        View.GONE
+//                    }
+                }
+            }
+        }
+    }
+
+    private fun selectTabItem(tabButton: View, tabButtonIndicator: View?) {
+        val tabIndicatorColor = ContextCompat.getColor(this, R.color.tab_indicator)
+        tabButtonIndicator?.visibility = View.VISIBLE
+        (tabButton as? Button)?.setColor(tabIndicatorColor)
+        (tabButton as? ImageButton)?.setColorFilter(tabIndicatorColor)
+    }
+
+    private fun deselectTabItem(tabButton: View, tabButtonIndicator: View?) {
+        val typedValue = TypedValue()
+        theme.resolveAttribute(android.R.attr.textColorPrimary, typedValue, true)
+        val colorRes = typedValue.run { if (resourceId != 0) resourceId else data }
+        val defaultTextColor = ContextCompat.getColor(this@SearchActivity, colorRes)
+        tabButtonIndicator?.visibility = View.INVISIBLE
+        (tabButton as? Button)?.setColor(defaultTextColor)
+        (tabButton as? ImageButton)?.setColorFilter(defaultTextColor)
+    }
+
+    private fun Button.setColor(@ColorInt color: Int) {
+        Log.d(TAG, "setColor: $compoundDrawables")
+        compoundDrawables.getOrNull(1)?.colorFilter =
+            BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
+                color,
+                BlendModeCompat.SRC_ATOP
+            )
+        setTextColor(color)
     }
 }
