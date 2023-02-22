@@ -33,6 +33,7 @@ class SearchActivity : AppCompatActivity() {
             supportFragmentManager.findFragmentByTag(it.name) ?: ResultFragment.newInstance(it)
         }
         binding = ActivitySearchBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(this))
         L.writeLogs(false)
@@ -44,7 +45,6 @@ class SearchActivity : AppCompatActivity() {
                 add(R.id.result_container, resultFragments[Category.NEWS]!!, Category.NEWS.name)
             }
         }
-        setContentView(binding.root)
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
