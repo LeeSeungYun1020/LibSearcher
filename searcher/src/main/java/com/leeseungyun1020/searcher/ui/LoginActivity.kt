@@ -23,7 +23,6 @@ class LoginActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.loginButton.setOnClickListener {
-            Log.d(TAG, "onCreate: ${(application as MainApplication).supportLoginTypes}")
             val types = (application as MainApplication).supportLoginTypes
             if (types.size == 1) {
                 login(types.first())

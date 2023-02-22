@@ -2,7 +2,6 @@ package com.leeseungyun1020.searcher.ui
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.util.TypedValue
 import android.view.KeyEvent
 import android.view.View
@@ -26,7 +25,6 @@ import com.leeseungyun1020.searcher.R
 import com.leeseungyun1020.searcher.databinding.ActivitySearchBinding
 import com.leeseungyun1020.searcher.network.NetworkManager
 import com.leeseungyun1020.searcher.utilities.Category
-import com.leeseungyun1020.searcher.utilities.TAG
 import com.leeseungyun1020.searcher.viewmodels.SearchViewModel
 import com.nostra13.universalimageloader.core.ImageLoader
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration
@@ -188,7 +186,6 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun Button.setColor(@ColorInt color: Int) {
-        Log.d(TAG, "setColor: $compoundDrawables")
         compoundDrawables.getOrNull(1)?.colorFilter =
             BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
                 color,

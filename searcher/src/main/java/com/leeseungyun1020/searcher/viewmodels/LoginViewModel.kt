@@ -71,7 +71,7 @@ class LoginViewModel : ViewModel() {
         onSuccess: (message: String) -> Unit,
         onFailure: (message: String) -> Unit
     ) {
-        Log.d(TAG, "Did you check key hash?: ${Utility.getKeyHash(context)}")
+        Log.i(TAG, "Did you check key hash?: ${Utility.getKeyHash(context)}")
 
         fun loadUserInfo() {
             UserApiClient.instance.me { user, error ->
