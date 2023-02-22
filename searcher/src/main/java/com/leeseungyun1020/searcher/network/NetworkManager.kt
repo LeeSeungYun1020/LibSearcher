@@ -17,16 +17,26 @@ object NetworkManager {
     private var type = Type.NAVER
     private var id = ""
     private var pw = ""
+    private var api = ""
 
-    fun init(type: Type, id: String, pw: String) {
-        this.type = type
+    fun init(id: String, pw: String) {
+        this.type = Type.NAVER
         this.id = id
         this.pw = pw
     }
 
-    fun init(type: Type, pw: String) {
-        this.type = type
-        this.pw = pw
+    fun init(api: String) {
+        this.type = Type.KAKAO
+        this.api = api
+    }
+
+    fun changeType(type: Type) {
+        if (type == Type.NAVER && id.isNotEmpty() && pw.isNotEmpty())
+            this.type = Type.NAVER
+        else if (type == Type.KAKAO && api.isNotEmpty())
+            this.type = Type.KAKAO
+        else
+            Log.e(TAG, "NetworkManager: failed change type")
     }
 
     private suspend fun getResponseFromUrl(url: String): String = withContext(Dispatchers.IO) {
@@ -39,7 +49,7 @@ object NetworkManager {
                     connection.setRequestProperty("X-Naver-Client-Secret", pw)
                 }
                 Type.KAKAO -> {
-                    connection.setRequestProperty("Authorization", "KakaoAK $pw")
+                    connection.setRequestProperty("Authorization", "KakaoAK $api")
                 }
             }
             connect()

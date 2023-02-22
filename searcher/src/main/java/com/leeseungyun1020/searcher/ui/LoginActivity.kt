@@ -2,52 +2,20 @@ package com.leeseungyun1020.searcher.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.kakao.sdk.auth.model.OAuthToken
-import com.kakao.sdk.common.KakaoSdk
-import com.kakao.sdk.common.model.ClientError
-import com.kakao.sdk.common.model.ClientErrorCause
-import com.kakao.sdk.common.util.Utility
-import com.kakao.sdk.user.UserApiClient
 import com.leeseungyun1020.searcher.databinding.ActivityLoginBinding
-import com.leeseungyun1020.searcher.utilities.TAG
-import com.leeseungyun1020.searcher.utilities.Type
-import com.leeseungyun1020.searcher.utilities.checkMetaData
-import com.navercorp.nid.NaverIdLoginSDK
-import com.navercorp.nid.oauth.NidOAuthLogin
-import com.navercorp.nid.oauth.OAuthLoginCallback
-import com.navercorp.nid.profile.NidProfileCallback
-import com.navercorp.nid.profile.data.NidProfileResponse
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
-    private var type: Type? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        checkMetaData(
-            packageManager, packageName,
-            onSuccess = { metaData ->
-                type = metaData.type
-                when (metaData.type) {
-                    Type.NAVER -> NaverIdLoginSDK.initialize(
-                        this,
-                        metaData.id,
-                        metaData.pw,
-                        applicationInfo.loadLabel(packageManager).toString()
-                    )
-                    Type.KAKAO -> KakaoSdk.init(applicationContext, metaData.id)
-                }
-            },
-            onError = {
-                Log.e(TAG, "LoginActivity checkMetaData: $it")
-                finish()
-            },
-        )
         binding = ActivityLoginBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         binding.loginButton.setOnClickListener {
+            startActivity(Intent(this, SearchActivity::class.java))
+            finish()
+            /*
             when (type) {
                 Type.NAVER -> {
                     NaverIdLoginSDK.authenticate(this, object : OAuthLoginCallback {
@@ -143,7 +111,7 @@ class LoginActivity : AppCompatActivity() {
                     finish()
                 }
             }
+             */
         }
-        setContentView(binding.root)
     }
 }

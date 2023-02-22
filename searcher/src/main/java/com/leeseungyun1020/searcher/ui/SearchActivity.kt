@@ -2,7 +2,6 @@ package com.leeseungyun1020.searcher.ui
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.KeyEvent
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
@@ -14,11 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.leeseungyun1020.searcher.R
 import com.leeseungyun1020.searcher.databinding.ActivitySearchBinding
-import com.leeseungyun1020.searcher.network.NetworkManager
 import com.leeseungyun1020.searcher.utilities.Category
-import com.leeseungyun1020.searcher.utilities.TAG
-import com.leeseungyun1020.searcher.utilities.Type
-import com.leeseungyun1020.searcher.utilities.checkMetaData
 import com.leeseungyun1020.searcher.viewmodels.SearchViewModel
 import com.nostra13.universalimageloader.core.ImageLoader
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration
@@ -32,18 +27,6 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        checkMetaData(packageManager, packageName,
-            onSuccess = { metaData ->
-                when (metaData.type) {
-                    Type.NAVER -> NetworkManager.init(Type.NAVER, metaData.id, metaData.pw)
-                    Type.KAKAO -> NetworkManager.init(Type.KAKAO, metaData.pw)
-                }
-            },
-            onError = {
-                Log.e(TAG, "SearchActivity checkMetaData: $it")
-                finish()
-            })
-
         val resultFragments = Category.values().associateWith {
             supportFragmentManager.findFragmentByTag(it.name) ?: ResultFragment.newInstance(it)
         }
