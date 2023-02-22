@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.leeseungyun1020.searcher.MainApplication
+import com.leeseungyun1020.searcher.R
 import com.leeseungyun1020.searcher.databinding.ActivityLoginBinding
 import com.leeseungyun1020.searcher.utilities.TAG
 import com.leeseungyun1020.searcher.viewmodels.LoginViewModel
@@ -22,8 +23,10 @@ class LoginActivity : AppCompatActivity() {
         val viewModel: LoginViewModel by viewModels()
         binding.loginButton.setOnClickListener {
             Log.d(TAG, "onCreate: ${(application as MainApplication).supportLoginTypes}")
-            LoginDialogFragment(
-                loginTypes = (application as MainApplication).supportLoginTypes,
+            TypeSelectDialogFragment(
+                types = (application as MainApplication).supportLoginTypes,
+                titleId = R.string.login,
+                emptyMessageId = R.string.login_unsupported_error,
                 onSelect = { type ->
                     viewModel.login(
                         type = type,

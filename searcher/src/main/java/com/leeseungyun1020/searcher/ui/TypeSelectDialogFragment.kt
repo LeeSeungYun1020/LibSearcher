@@ -2,28 +2,31 @@ package com.leeseungyun1020.searcher.ui
 
 import android.app.Dialog
 import android.os.Bundle
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.leeseungyun1020.searcher.R
 import com.leeseungyun1020.searcher.utilities.Type
 
-class LoginDialogFragment(
-    private val loginTypes: Set<Type>,
+class TypeSelectDialogFragment(
+    private val types: Set<Type>,
+    @StringRes private val titleId: Int,
+    @StringRes private val emptyMessageId: Int,
     private val onSelect: (type: Type) -> Unit
 ) : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let { it ->
             var checkedItem = 0
             val builder = AlertDialog.Builder(it)
-            val supportedTypes = loginTypes.toList()
+            val supportedTypes = types.toList()
 
             if (supportedTypes.isEmpty()) {
-                builder.setTitle(R.string.login)
-                    .setMessage(R.string.login_unsupported_error)
+                builder.setTitle(titleId)
+                    .setMessage(emptyMessageId)
                     .setPositiveButton(android.R.string.ok, null)
                     .create()
             } else {
-                builder.setTitle(R.string.login)
+                builder.setTitle(titleId)
                     .setSingleChoiceItems(
                         supportedTypes.map { type -> type.name }.toTypedArray(), checkedItem
                     ) { _, which ->
