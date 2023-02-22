@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
-import com.leeseungyun1020.searcher.R
 import com.leeseungyun1020.searcher.utilities.Type
 
 class TypeSelectDialogFragment(
@@ -32,7 +31,7 @@ class TypeSelectDialogFragment(
                     ) { _, which ->
                         checkedItem = which
                     }
-                    .setPositiveButton(R.string.login) { _, _ ->
+                    .setPositiveButton(titleId) { _, _ ->
                         onSelect(supportedTypes[checkedItem])
                     }
                     .create()

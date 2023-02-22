@@ -28,7 +28,7 @@ class SearchViewModel : ViewModel() {
     private val _newsPagingOptions = PagingOptions(30, 0, true)
 
     fun search(keyword: String) {
-        if (keyword.isNotBlank() && keyword != _keyword.value) {
+        if (keyword.isNotBlank()) {
             _keyword.value = keyword
             _newsPagingOptions.reset()
             _imagePagingOptions.reset()

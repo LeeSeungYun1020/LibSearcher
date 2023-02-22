@@ -11,8 +11,10 @@ import androidx.fragment.app.commit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.leeseungyun1020.searcher.MainApplication
 import com.leeseungyun1020.searcher.R
 import com.leeseungyun1020.searcher.databinding.ActivitySearchBinding
+import com.leeseungyun1020.searcher.network.NetworkManager
 import com.leeseungyun1020.searcher.utilities.Category
 import com.leeseungyun1020.searcher.viewmodels.SearchViewModel
 import com.nostra13.universalimageloader.core.ImageLoader
@@ -104,8 +106,16 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun search() {
-        viewModel.search(binding.searchBox.text.toString())
-        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(binding.searchBox.windowToken, 0)
+        TypeSelectDialogFragment(
+            types = (application as MainApplication).supportSearchTypes,
+            titleId = R.string.search,
+            emptyMessageId = R.string.search_unsupported_error,
+            onSelect = { type ->
+                NetworkManager.changeType(type)
+                viewModel.search(binding.searchBox.text.toString())
+                val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.hideSoftInputFromWindow(binding.searchBox.windowToken, 0)
+            }
+        ).show(supportFragmentManager, "search")
     }
 }
