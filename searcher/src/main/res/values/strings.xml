@@ -6,4 +6,5 @@
     <string name="news">News</string>
     <string name="title">Title</string>
     <string name="template_date" translatable="false">2022/02/02</string>
+    <string name="login_unsupported_error">There is no supported login type.</string>
 </resources>

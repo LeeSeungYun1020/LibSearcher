@@ -9,8 +9,13 @@ import com.leeseungyun1020.searcher.utilities.Type
 import com.navercorp.nid.NaverIdLoginSDK
 
 class MainApplication : Application() {
-    private val _supportTypes: MutableSet<Type> = mutableSetOf()
-    val supportTypes = _supportTypes.toSet()
+    private val _supportLoginTypes: MutableSet<Type> = mutableSetOf()
+    val supportLoginTypes
+        get() = _supportLoginTypes.toSet()
+
+    private val _supportSearchTypes: MutableSet<Type> = mutableSetOf()
+    val supportSearchTypes
+        get() = _supportSearchTypes.toSet()
 
     override fun onCreate() {
         super.onCreate()
@@ -32,8 +37,10 @@ class MainApplication : Application() {
         val pw = metaData.getString("com.leeseungyun1020.searcher.sdk.naver.pw")
         val app = metaData.getString("com.leeseungyun1020.searcher.sdk.kakao.app")
         val api = metaData.getString("com.leeseungyun1020.searcher.sdk.kakao.api")
+
         if (!id.isNullOrEmpty() && !pw.isNullOrEmpty()) {
-            _supportTypes += Type.NAVER
+            _supportLoginTypes += Type.NAVER
+            _supportSearchTypes += Type.NAVER
             NaverIdLoginSDK.initialize(
                 this,
                 id,
@@ -42,9 +49,12 @@ class MainApplication : Application() {
             )
             NetworkManager.init(id, pw)
         }
-        if (!app.isNullOrEmpty() && !api.isNullOrEmpty()) {
-            _supportTypes += Type.KAKAO
+        if (!app.isNullOrEmpty()) {
+            _supportLoginTypes += Type.KAKAO
             KakaoSdk.init(applicationContext, app)
+        }
+        if (!api.isNullOrEmpty()) {
+            _supportSearchTypes += Type.KAKAO
             NetworkManager.init(api)
         }
     }
