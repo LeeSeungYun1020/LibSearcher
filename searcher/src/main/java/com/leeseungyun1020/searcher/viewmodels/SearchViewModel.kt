@@ -27,6 +27,9 @@ class SearchViewModel : ViewModel() {
     val newsResult = _newsResult.asStateFlow()
     private val _newsPagingOptions = PagingOptions(30, 0, true)
 
+    private val _tabVisibility = MutableStateFlow(true)
+    val tabVisibility = _tabVisibility.asStateFlow()
+
     fun search(keyword: String) {
         if (keyword.isNotBlank()) {
             _keyword.value = keyword
@@ -116,6 +119,14 @@ class SearchViewModel : ViewModel() {
                 ItemResult(_imageResult.value.items, Mode.COMPLETE)
             Category.NEWS -> _newsResult.value = ItemResult(_newsResult.value.items, Mode.COMPLETE)
         }
+    }
+
+    fun hideTab() {
+        _tabVisibility.value = false
+    }
+
+    fun showTab() {
+        _tabVisibility.value = true
     }
 
     class Location(

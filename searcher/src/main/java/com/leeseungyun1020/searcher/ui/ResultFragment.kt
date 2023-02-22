@@ -135,6 +135,12 @@ class ResultFragment : Fragment() {
                     if (lastVisibleItemPosition == lastItemPosition) {
                         loadMoreItem()
                     }
+
+                    if (dy >= 0 && resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                        viewModel.hideTab()
+                    } else {
+                        viewModel.showTab()
+                    }
                 }
             })
             addItemDecoration(itemDecoration)

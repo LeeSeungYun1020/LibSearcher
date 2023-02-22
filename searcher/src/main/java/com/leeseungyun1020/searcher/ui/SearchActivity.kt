@@ -3,6 +3,7 @@ package com.leeseungyun1020.searcher.ui
 import android.content.Context
 import android.os.Bundle
 import android.view.KeyEvent
+import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.viewModels
@@ -65,6 +66,17 @@ class SearchActivity : AppCompatActivity() {
                             setReorderingAllowed(true)
                             addToBackStack(location.category.name)
                         }
+                    }
+                }
+            }
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.tabVisibility.collect { isVisible ->
+                    binding.searchTab.tabGroup?.visibility = if (isVisible) {
+                        View.VISIBLE
+                    } else {
+                        View.GONE
                     }
                 }
             }
