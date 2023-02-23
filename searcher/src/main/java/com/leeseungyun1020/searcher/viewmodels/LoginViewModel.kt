@@ -39,7 +39,7 @@ class LoginViewModel : ViewModel() {
                 NidOAuthLogin().callProfileApi(object :
                     NidProfileCallback<NidProfileResponse> {
                     override fun onSuccess(result: NidProfileResponse) {
-                        onSuccess(result.toString())
+                        onSuccess(result.profile?.name.toString())
                     }
 
                     override fun onFailure(httpStatus: Int, message: String) {
