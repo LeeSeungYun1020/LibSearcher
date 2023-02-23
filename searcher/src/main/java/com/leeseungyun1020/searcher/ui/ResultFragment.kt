@@ -34,7 +34,7 @@ import kotlinx.coroutines.launch
 
 private const val CATEGORY = "category"
 
-class ResultFragment : Fragment() {
+class ResultFragment private constructor() : Fragment() {
 
     companion object {
         fun newInstance(category: Category) = ResultFragment().apply {
@@ -128,7 +128,6 @@ class ResultFragment : Fragment() {
             addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 var isScrollDown = false
 
-
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(recyclerView, dx, dy)
 
@@ -181,8 +180,9 @@ class ResultFragment : Fragment() {
                                     list += it.items
                                     itemAdapter.notifyItemRangeInserted(0, list.size)
                                 } else if (viewModel.keyword.value.isNotBlank()) {
-                                    binding.messageTextView.text =
+                                    val messageText =
                                         "${viewModel.keyword.value} ${getString(R.string.msg_empty_result)}"
+                                    binding.messageTextView.text = messageText
                                 } else {
                                     binding.messageTextView.setText(R.string.msg_start_search)
                                 }
