@@ -15,6 +15,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.leeseungyun1020.searcher.R
 import com.leeseungyun1020.searcher.adapters.ImageAdapter
 import com.leeseungyun1020.searcher.adapters.ImageDecoration
 import com.leeseungyun1020.searcher.adapters.NewsAdapter
@@ -61,7 +62,7 @@ class ResultFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentResultBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -163,6 +164,7 @@ class ResultFragment : Fragment() {
                             val add = it.items.subList(start, it.items.size)
                             list += add
                             itemAdapter.notifyItemRangeInserted(start, add.size)
+                            binding.messageTextView.text = ""
                             category?.let { cat -> viewModel.loadComplete(cat) }
                         }
                         Mode.REPLACE -> {
@@ -170,12 +172,20 @@ class ResultFragment : Fragment() {
                             list += it.items
                             itemAdapter.notifyDataSetChanged()
                             binding.recyclerView.scrollToPosition(0)
+                            binding.messageTextView.text = ""
                             category?.let { cat -> viewModel.loadComplete(cat) }
                         }
                         Mode.COMPLETE -> {
                             if (list.isEmpty()) {
-                                list += it.items
-                                itemAdapter.notifyItemRangeInserted(0, list.size)
+                                if (it.items.isNotEmpty()) {
+                                    list += it.items
+                                    itemAdapter.notifyItemRangeInserted(0, list.size)
+                                } else if (viewModel.keyword.value.isNotBlank()) {
+                                    binding.messageTextView.text =
+                                        "${viewModel.keyword.value} ${getString(R.string.msg_empty_result)}"
+                                } else {
+                                    binding.messageTextView.setText(R.string.msg_start_search)
+                                }
                             }
                         }
                     }

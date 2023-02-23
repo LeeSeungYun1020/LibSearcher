@@ -8,4 +8,6 @@
     <string name="template_date" translatable="false">2022/02/02</string>
     <string name="login_unsupported_error">There is no supported login type.</string>
     <string name="search_unsupported_error">There is no supported search type.</string>
+    <string name="msg_empty_result">did not match any resources.</string>
+    <string name="msg_start_search">Enter keyword and Start search</string>
 </resources>

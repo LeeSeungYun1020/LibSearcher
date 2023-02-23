@@ -19,11 +19,11 @@ class SearchViewModel : ViewModel() {
     private val _location = MutableStateFlow(Location(Category.NEWS, true))
     val location = _location.asStateFlow()
 
-    private val _imageResult = MutableStateFlow(ItemResult<Image>(emptyList(), Mode.REPLACE))
+    private val _imageResult = MutableStateFlow(ItemResult<Image>(emptyList(), Mode.COMPLETE))
     val imageResult = _imageResult.asStateFlow()
     private val _imagePagingOptions = PagingOptions(30, 0, true)
 
-    private val _newsResult = MutableStateFlow(ItemResult<News>(emptyList(), Mode.REPLACE))
+    private val _newsResult = MutableStateFlow(ItemResult<News>(emptyList(), Mode.COMPLETE))
     val newsResult = _newsResult.asStateFlow()
     private val _newsPagingOptions = PagingOptions(30, 0, true)
 

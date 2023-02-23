@@ -8,4 +8,6 @@
     <string name="title">제목</string>
     <string name="login_unsupported_error">지원 가능한 로그인 타입이 없습니다.</string>
     <string name="search_unsupported_error">지원 가능한 검색 타입이 없어 검색할 수 없습니다.</string>
+    <string name="msg_empty_result">일치하는 검색 결과가 없습니다.</string>
+    <string name="msg_start_search">키워드를 입력하고 검색을 시작해보세요.</string>
 </resources>
