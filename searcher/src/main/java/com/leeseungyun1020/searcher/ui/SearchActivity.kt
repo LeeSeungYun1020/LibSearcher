@@ -46,7 +46,7 @@ class SearchActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         initUi()
-        if (savedInstanceState == null) {
+        if (savedInstanceState == null) { // 실행된 적이 없는 경우
             supportFragmentManager.commit {
                 setReorderingAllowed(true)
                 add(R.id.result_container, resultFragments[Category.NEWS]!!, Category.NEWS.name)
@@ -94,6 +94,7 @@ class SearchActivity : AppCompatActivity() {
         if (types.size == 1) {
             val keyword = binding.searchBox.text.toString()
             if (viewModel.keyword.value != keyword) {
+                // 하나의 타입만 지원할 경우 같은 키워드에 대해서는 검색 결과 갱신이 필요하지 않음
                 viewModel.search(keyword)
             }
             val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -117,6 +118,7 @@ class SearchActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.location.collect { location ->
+                    // 프래그먼트 대응
                     if (initial) {
                         initial = false
                     } else if (location.move) {
@@ -135,6 +137,7 @@ class SearchActivity : AppCompatActivity() {
                         }
                     }
 
+                    // 탭 대응
                     when (location.category) {
                         Category.NEWS -> {
                             binding.searchTab.apply {
