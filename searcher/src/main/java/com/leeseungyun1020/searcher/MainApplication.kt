@@ -7,6 +7,10 @@ import com.kakao.sdk.common.KakaoSdk
 import com.leeseungyun1020.searcher.network.NetworkManager
 import com.leeseungyun1020.searcher.utilities.Type
 import com.navercorp.nid.NaverIdLoginSDK
+import com.nostra13.universalimageloader.core.DisplayImageOptions
+import com.nostra13.universalimageloader.core.ImageLoader
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration
+import com.nostra13.universalimageloader.utils.L
 
 class MainApplication : Application() {
     private val _supportLoginTypes: MutableSet<Type> = mutableSetOf()
@@ -56,6 +60,21 @@ class MainApplication : Application() {
         if (!api.isNullOrEmpty()) {
             _supportSearchTypes += Type.KAKAO
             NetworkManager.init(api)
+        }
+
+        try {
+            val imageOptions = DisplayImageOptions.Builder()
+                .cacheInMemory(true)
+                .cacheOnDisk(true)
+                .build()
+            ImageLoader.getInstance().init(
+                ImageLoaderConfiguration.Builder(this)
+                    .defaultDisplayImageOptions(imageOptions)
+                    .build()
+            )
+            L.writeLogs(false)
+        } catch (e: Exception) {
+            _supportSearchTypes.clear()
         }
     }
 }

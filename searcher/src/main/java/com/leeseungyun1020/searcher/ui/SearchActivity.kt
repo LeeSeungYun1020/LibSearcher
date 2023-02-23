@@ -26,10 +26,6 @@ import com.leeseungyun1020.searcher.databinding.ActivitySearchBinding
 import com.leeseungyun1020.searcher.network.NetworkManager
 import com.leeseungyun1020.searcher.utilities.Category
 import com.leeseungyun1020.searcher.viewmodels.SearchViewModel
-import com.nostra13.universalimageloader.core.DisplayImageOptions
-import com.nostra13.universalimageloader.core.ImageLoader
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration
-import com.nostra13.universalimageloader.utils.L
 import kotlinx.coroutines.launch
 
 class SearchActivity : AppCompatActivity() {
@@ -45,17 +41,6 @@ class SearchActivity : AppCompatActivity() {
         }
         binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        val imageOptions = DisplayImageOptions.Builder()
-            .cacheInMemory(true)
-            .cacheOnDisk(true)
-            .build()
-        ImageLoader.getInstance().init(
-            ImageLoaderConfiguration.Builder(this)
-                .defaultDisplayImageOptions(imageOptions)
-                .build()
-        )
-        L.writeLogs(false)
 
         initUi()
         if (savedInstanceState == null) {
