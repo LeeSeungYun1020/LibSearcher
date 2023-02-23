@@ -26,10 +26,10 @@ import com.leeseungyun1020.searcher.databinding.FragmentResultBinding
 import com.leeseungyun1020.searcher.utilities.Category
 import com.leeseungyun1020.searcher.utilities.Mode
 import com.leeseungyun1020.searcher.utilities.TAG
+import com.leeseungyun1020.searcher.utilities.dp
 import com.leeseungyun1020.searcher.viewmodels.SearchViewModel
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlin.math.roundToInt
 
 private const val CATEGORY = "category"
 
@@ -76,8 +76,8 @@ class ResultFragment : Fragment() {
                     itemAdapter = NewsAdapter(list),
                     itemLayoutManager = LinearLayoutManager(context),
                     itemDecoration = NewsDecoration(
-                        (4 * resources.displayMetrics.density).roundToInt(),
-                        (8 * resources.displayMetrics.density).roundToInt()
+                        4.dp(requireContext()),
+                        8.dp(requireContext())
                     ),
                     itemResult = viewModel.newsResult,
                     loadMoreItem = { viewModel.loadMore(Category.NEWS) }
@@ -96,8 +96,8 @@ class ResultFragment : Fragment() {
                     itemLayoutManager = GridLayoutManager(context, spanCount),
                     itemDecoration = ImageDecoration(
                         spanCount,
-                        (8 * resources.displayMetrics.density).roundToInt(),
-                        (4 * resources.displayMetrics.density).roundToInt()
+                        8.dp(requireContext()),
+                        4.dp(requireContext())
                     ),
 
                     itemResult = viewModel.imageResult,
@@ -125,6 +125,9 @@ class ResultFragment : Fragment() {
             layoutManager = itemLayoutManager
             adapter = itemAdapter
             addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                var isScrollDown = false
+
+
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(recyclerView, dx, dy)
 
@@ -135,11 +138,17 @@ class ResultFragment : Fragment() {
                     if (lastVisibleItemPosition == lastItemPosition) {
                         loadMoreItem()
                     }
+                    isScrollDown = dy > 0
+                }
 
-                    if (dy >= 0 && resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
-                        viewModel.hideTab()
-                    } else {
-                        viewModel.showTab()
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    super.onScrollStateChanged(recyclerView, newState)
+
+                    if (newState == RecyclerView.SCROLL_STATE_SETTLING) {
+                        if (isScrollDown && resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT)
+                            viewModel.hideTab()
+                        else
+                            viewModel.showTab()
                     }
                 }
             })

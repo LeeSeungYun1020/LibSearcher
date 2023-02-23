@@ -1,6 +1,7 @@
 package com.leeseungyun1020.searcher.ui
 
 import android.content.Context
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.KeyEvent
@@ -15,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.lifecycle.Lifecycle
@@ -25,6 +27,7 @@ import com.leeseungyun1020.searcher.R
 import com.leeseungyun1020.searcher.databinding.ActivitySearchBinding
 import com.leeseungyun1020.searcher.network.NetworkManager
 import com.leeseungyun1020.searcher.utilities.Category
+import com.leeseungyun1020.searcher.utilities.dp
 import com.leeseungyun1020.searcher.viewmodels.SearchViewModel
 import kotlinx.coroutines.launch
 
@@ -152,11 +155,27 @@ class SearchActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.tabVisibility.collect { isVisible ->
-//                    binding.searchTab.tabGroup?.visibility = if (isVisible) {
-//                        View.VISIBLE
-//                    } else {
-//                        View.GONE
-//                    }
+                    if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                        binding.searchTab.apply {
+                            val tabHeight = 64.dp(this@SearchActivity)
+                            val hideHeight = 2.dp(this@SearchActivity)
+                            if (isVisible) {
+                                newsTabButton.updateLayoutParams {
+                                    height = tabHeight
+                                }
+                                imageTabButton.updateLayoutParams {
+                                    height = tabHeight
+                                }
+                            } else {
+                                newsTabButton.updateLayoutParams {
+                                    height = hideHeight
+                                }
+                                imageTabButton.updateLayoutParams {
+                                    height = hideHeight
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
