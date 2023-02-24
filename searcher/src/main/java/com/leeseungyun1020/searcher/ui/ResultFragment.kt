@@ -34,7 +34,7 @@ import kotlinx.coroutines.launch
 
 private const val CATEGORY = "category"
 
-class ResultFragment private constructor() : Fragment() {
+class ResultFragment : Fragment() {
 
     companion object {
         fun newInstance(category: Category) = ResultFragment().apply {
