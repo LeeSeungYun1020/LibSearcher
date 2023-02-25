@@ -50,9 +50,9 @@ class ImageAdapter(private val list: List<Image>) :
 }
 
 class ImageDecoration(
-    private val spanCount: Int,
-    private val borderSpacing: Int,
-    private val gridSpacing: Int
+    var spanCount: Int,
+    var borderSpacing: Int,
+    var gridSpacing: Int
 ) :
     RecyclerView.ItemDecoration() {
     override fun getItemOffsets(

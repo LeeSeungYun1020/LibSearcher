@@ -11,12 +11,30 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <androidx.constraintlayout.widget.Group
-            android:id="@+id/tab_group"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:visibility="visible"
-            app:constraint_referenced_ids="news_tab_button, image_tab_button" />
+        <LinearLayout
+            android:id="@+id/vertical_tab"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageButton
+                android:id="@+id/news_tab_image_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/news"
+                android:src="@drawable/ic_newspaper_24" />
+
+            <ImageButton
+                android:id="@+id/image_tab_image_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/image"
+                android:src="@drawable/ic_image_24" />
+        </LinearLayout>
 
         <Button
             android:id="@+id/news_tab_button"
@@ -64,11 +82,11 @@
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/result_container"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@id/vertical_tab"
             app:layout_constraintTop_toBottomOf="@id/news_tab_button"
             tools:layout="@layout/fragment_result" />
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -49,6 +49,21 @@ class ResultFragment : Fragment() {
     private val viewModel: SearchViewModel by activityViewModels()
     private var category: Category? = null
 
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        if (category == Category.IMAGE) {
+            val spanCount = when (newConfig.orientation) {
+                Configuration.ORIENTATION_PORTRAIT -> 3
+                Configuration.ORIENTATION_LANDSCAPE -> 5
+                else -> 3
+            }
+            binding.recyclerView.apply {
+                (layoutManager as GridLayoutManager).spanCount = spanCount
+                (getItemDecorationAt(0) as? ImageDecoration)?.spanCount = spanCount
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {

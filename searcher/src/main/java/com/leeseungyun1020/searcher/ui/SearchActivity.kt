@@ -37,6 +37,11 @@ class SearchActivity : AppCompatActivity() {
     private val viewModel: SearchViewModel by viewModels()
     private var initial = true
 
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        setLayout(newConfig.orientation)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         resultFragments = Category.values().associateWith {
@@ -56,6 +61,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun initUi() {
+        setLayout(resources.configuration.orientation)
         binding.apply {
             searchBox.apply {
                 setOnEditorActionListener { _, actionId, _ ->
@@ -82,9 +88,31 @@ class SearchActivity : AppCompatActivity() {
                 newsTabButton.setOnClickListener {
                     viewModel.onCategoryButtonClicked(Category.NEWS)
                 }
+                newsTabImageButton.setOnClickListener {
+                    viewModel.onCategoryButtonClicked(Category.NEWS)
+                }
                 imageTabButton.setOnClickListener {
                     viewModel.onCategoryButtonClicked(Category.IMAGE)
                 }
+                imageTabImageButton.setOnClickListener {
+                    viewModel.onCategoryButtonClicked(Category.IMAGE)
+                }
+            }
+        }
+    }
+
+    private fun setLayout(orientation: Int) {
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            binding.searchTab.apply {
+                verticalTab.visibility = View.VISIBLE
+                newsTabButton.visibility = View.GONE
+                imageTabButton.visibility = View.GONE
+            }
+        } else {
+            binding.searchTab.apply {
+                verticalTab.visibility = View.GONE
+                newsTabButton.visibility = View.VISIBLE
+                imageTabButton.visibility = View.VISIBLE
             }
         }
     }
@@ -141,14 +169,14 @@ class SearchActivity : AppCompatActivity() {
                     when (location.category) {
                         Category.NEWS -> {
                             binding.searchTab.apply {
-                                selectTabItem(newsTabButton, newsTabButtonIndicator)
-                                deselectTabItem(imageTabButton, imageTabButtonIndicator)
+                                selectTabItem(Category.NEWS)
+                                selectTabItem(Category.IMAGE, false)
                             }
                         }
                         Category.IMAGE -> {
                             binding.searchTab.apply {
-                                deselectTabItem(newsTabButton, newsTabButtonIndicator)
-                                selectTabItem(imageTabButton, imageTabButtonIndicator)
+                                selectTabItem(Category.NEWS, false)
+                                selectTabItem(Category.IMAGE)
                             }
                         }
                     }
@@ -184,21 +212,38 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    private fun selectTabItem(tabButton: View, tabButtonIndicator: View?) {
-        val tabIndicatorColor = ContextCompat.getColor(this, R.color.tab_indicator)
-        tabButtonIndicator?.visibility = View.VISIBLE
-        (tabButton as? Button)?.setColor(tabIndicatorColor)
-        (tabButton as? ImageButton)?.setColorFilter(tabIndicatorColor)
-    }
+    private fun selectTabItem(category: Category, isSelected: Boolean = true) {
+        val tabButton: Button
+        val tabButtonIndicator: View
+        val tabImageButton: ImageButton
+        when (category) {
+            Category.NEWS -> {
+                tabButton = binding.searchTab.newsTabButton
+                tabButtonIndicator = binding.searchTab.newsTabButtonIndicator
+                tabImageButton = binding.searchTab.newsTabImageButton
+            }
+            Category.IMAGE -> {
+                tabButton = binding.searchTab.imageTabButton
+                tabButtonIndicator = binding.searchTab.imageTabButtonIndicator
+                tabImageButton = binding.searchTab.imageTabImageButton
+            }
+        }
 
-    private fun deselectTabItem(tabButton: View, tabButtonIndicator: View?) {
-        val typedValue = TypedValue()
-        theme.resolveAttribute(android.R.attr.textColorPrimary, typedValue, true)
-        val colorRes = typedValue.run { if (resourceId != 0) resourceId else data }
-        val defaultTextColor = ContextCompat.getColor(this@SearchActivity, colorRes)
-        tabButtonIndicator?.visibility = View.INVISIBLE
-        (tabButton as? Button)?.setColor(defaultTextColor)
-        (tabButton as? ImageButton)?.setColorFilter(defaultTextColor)
+        val tabColor: Int
+        val tabIndicatorVisibility: Int
+        if (isSelected) {
+            tabColor = ContextCompat.getColor(this, R.color.tab_indicator)
+            tabIndicatorVisibility = View.VISIBLE
+        } else {
+            val typedValue = TypedValue()
+            theme.resolveAttribute(android.R.attr.textColorPrimary, typedValue, true)
+            val colorRes = typedValue.run { if (resourceId != 0) resourceId else data }
+            tabColor = ContextCompat.getColor(this@SearchActivity, colorRes)
+            tabIndicatorVisibility = View.INVISIBLE
+        }
+        tabButton.setColor(tabColor)
+        tabButtonIndicator.visibility = tabIndicatorVisibility
+        tabImageButton.setColorFilter(tabColor)
     }
 
     private fun Button.setColor(@ColorInt color: Int) {
