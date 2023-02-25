@@ -137,36 +137,37 @@ class ResultFragment : Fragment() {
         itemResult: StateFlow<ItemResult<T>>,
         loadMoreItem: () -> Unit,
     ) {
+        val scrollListener = object : RecyclerView.OnScrollListener() {
+            var isScrollDown = false
+
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                val lastVisibleItemPosition =
+                    (itemLayoutManager as LinearLayoutManager).findLastVisibleItemPosition()
+                val lastItemPosition = itemAdapter.itemCount - 1
+
+                if (lastVisibleItemPosition == lastItemPosition) {
+                    loadMoreItem()
+                }
+                isScrollDown = dy > 0
+            }
+
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+
+                if (newState == RecyclerView.SCROLL_STATE_SETTLING) {
+                    if (isScrollDown && resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT)
+                        viewModel.hideTab()
+                    else
+                        viewModel.showTab()
+                }
+            }
+        }
         binding.recyclerView.apply {
             layoutManager = itemLayoutManager
             adapter = itemAdapter
-            addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                var isScrollDown = false
-
-                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                    super.onScrolled(recyclerView, dx, dy)
-
-                    val lastVisibleItemPosition =
-                        (layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
-                    val lastItemPosition = itemAdapter.itemCount - 1
-
-                    if (lastVisibleItemPosition == lastItemPosition) {
-                        loadMoreItem()
-                    }
-                    isScrollDown = dy > 0
-                }
-
-                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                    super.onScrollStateChanged(recyclerView, newState)
-
-                    if (newState == RecyclerView.SCROLL_STATE_SETTLING) {
-                        if (isScrollDown && resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT)
-                            viewModel.hideTab()
-                        else
-                            viewModel.showTab()
-                    }
-                }
-            })
+            addOnScrollListener(scrollListener)
             addItemDecoration(itemDecoration)
         }
         viewLifecycleOwner.lifecycleScope.launch {
