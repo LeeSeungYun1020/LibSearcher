@@ -1,9 +1,9 @@
-package com.leeseungyun1020.toysearcher
+package com.leeseungyun1020.libsearcher
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.leeseungyun1020.libsearcher.databinding.ActivityMainBinding
 import com.leeseungyun1020.searcher.utilities.startLogin
-import com.leeseungyun1020.toysearcher.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace 'com.leeseungyun1020.toysearcher'
+    namespace 'com.leeseungyun1020.libsearcher'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.leeseungyun1020.toysearcher"
+        applicationId "com.leeseungyun1020.libsearcher"
         minSdk 21
         targetSdk 33
         versionCode 1

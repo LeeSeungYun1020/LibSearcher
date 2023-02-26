@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">ToySearcher</string>
+    <string name="app_name">LibSearcher</string>
     <string name="id">ID (없을 경우 빈칸)</string>
     <string name="type">타입</string>
     <string name="start">시작</string>
